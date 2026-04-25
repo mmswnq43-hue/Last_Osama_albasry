@@ -1,0 +1,224 @@
+openapi: 3.0.3
+info:
+  title: Gas_Yemen - API (summary for frontend)
+  version: '1.0.0'
+  description: >-
+    Compact OpenAPI summary of the main endpoints useful for frontend integration.
+servers:
+  - url: https://{{host}}/  # replace {{host}} with API base URL
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    LoginRequest:
+      type: object
+      properties:
+        phone:
+          type: string
+      required:
+        - phone
+    VerifyRequest:
+      type: object
+      properties:
+        phone:
+          type: string
+        code:
+          type: string
+      required:
+        - phone
+        - code
+    RefuelPayload:
+      type: object
+      properties:
+        station_id:
+          type: integer
+        liters:
+          type: number
+          format: float
+        price_per_liter:
+          type: number
+          format: float
+        qr_code_used:
+          type: string
+      required:
+        - station_id
+        - liters
+        - price_per_liter
+    CarWashPayload:
+      type: object
+      properties:
+        center_id:
+          type: integer
+        service_type:
+          type: string
+        price:
+          type: number
+      required:
+        - center_id
+        - service_type
+    MaintenancePayload:
+      type: object
+      properties:
+        center_id:
+          type: integer
+        issue:
+          type: string
+        price:
+          type: number
+      required:
+        - center_id
+
+paths:
+  /api/auth/login:
+    post:
+      summary: Request login code by phone
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Code sent (or existing session)
+
+  /api/auth/verify:
+    post:
+      summary: Verify login code and return token/session
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyRequest'
+      responses:
+        '200':
+          description: Authenticated; returns token or sets cookie
+
+  /api/owner/businesses:
+    get:
+      summary: List businesses (stations/car-wash/maintenance) for authenticated owner
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Array of businesses
+
+  /api/owner/overview:
+    get:
+      summary: Owner overview (revenue, recent refuels, activities)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Overview payload
+
+  /api/owner/refuels:
+    post:
+      summary: Owner-recorded refuel (manual entry)
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefuelPayload'
+      responses:
+        '201':
+          description: Refuel recorded
+
+  /api/worker/overview:
+    get:
+      summary: Worker dashboard (pending verifications, today activity)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Worker overview
+
+  /api/worker/refuels:
+    post:
+      summary: Worker records a refuel via QR or manual input
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefuelPayload'
+      responses:
+        '201':
+          description: Refuel recorded
+
+  /api/worker/car-wash:
+    post:
+      summary: Worker records a car-wash service
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CarWashPayload'
+      responses:
+        '201':
+          description: Car wash recorded
+
+  /api/worker/maintenance:
+    post:
+      summary: Worker records a maintenance service
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MaintenancePayload'
+      responses:
+        '201':
+          description: Maintenance recorded
+
+  /api/worker/verify-customer:
+    post:
+      summary: Verify customer by phone or subscription before service
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                phone:
+                  type: string
+              required:
+                - phone
+      responses:
+        '200':
+          description: Customer verified
+
+  /api/admin/reports/export:
+    get:
+      summary: CSV export for admin (revenue / daily_activity)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: type
+          schema:
+            type: string
+          description: Type of report (revenue,daily_activity)
+          required: true
+        - in: query
+          name: period
+          schema:
+            type: string
+          description: period filter (daily,monthly,yearly)
+      responses:
+        '200':
+          description: CSV file (text/csv)
+
+security:
+  - bearerAuth: []

@@ -1,0 +1,188 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Gas_Yemen Laravel API",
+    "version": "2.0.0",
+    "description": "OpenAPI summary aligned with the Laravel migration after adding system, analytics, stations, tickets, admin advanced endpoints, and FastAPI compatibility aliases. Replace {{host}} in servers with actual base URL."
+  },
+  "servers": [
+    { "url": "https://{{host}}/" }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "LoginRequest": {
+        "type": "object",
+        "properties": { "phone": { "type": "string" } },
+        "required": ["phone"]
+      },
+      "VerifyRequest": {
+        "type": "object",
+        "properties": { "phone": { "type": "string" }, "otp": { "type": "string" } },
+        "required": ["phone","otp"]
+      },
+      "PlanRequest": {
+        "type": "object",
+        "properties": { "plan_type": { "type": "string" } },
+        "required": ["plan_type"]
+      },
+      "TicketPayload": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string" },
+          "description": { "type": "string" },
+          "priority": { "type": "string" }
+        },
+        "required": ["title", "description"]
+      },
+      "RefuelPayload": {
+        "type": "object",
+        "properties": {
+          "station_id": { "type": "integer" },
+          "liters": { "type": "number", "format": "float" },
+          "price_per_liter": { "type": "number", "format": "float" },
+          "qr_code": { "type": "string" }
+        },
+        "required": ["station_id","liters","price_per_liter","qr_code"]
+      },
+      "CarWashPayload": {
+        "type": "object",
+        "properties": {
+          "center_id": { "type": "integer" },
+          "service_type": { "type": "string" },
+          "price": { "type": "number" }
+        },
+        "required": ["center_id","service_type"]
+      },
+      "MaintenancePayload": {
+        "type": "object",
+        "properties": {
+          "center_id": { "type": "integer" },
+          "issue": { "type": "string" },
+          "price": { "type": "number" }
+        },
+        "required": ["center_id"]
+      }
+    }
+  },
+  "paths": {
+    "/api/health": {
+      "get": {
+        "summary": "System health summary",
+        "responses": { "200": { "description": "Application and database health payload" } }
+      }
+    },
+    "/api/info": {
+      "get": {
+        "summary": "System info and feature summary",
+        "responses": { "200": { "description": "High-level system metadata" } }
+      }
+    },
+    "/api/analytics/system-overview": {
+      "get": {
+        "summary": "Admin analytics overview",
+        "security": [{"bearerAuth":[]}],
+        "responses": { "200": { "description": "Overview metrics for users, businesses, subscriptions, and services" } }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "summary": "Login and return bearer token",
+        "requestBody": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/LoginRequest" } } } },
+        "responses": { "200": { "description": "Authenticated user with bearer token" } }
+      }
+    },
+    "/api/auth/verify": {
+      "post": {
+        "summary": "Verify OTP",
+        "requestBody": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/VerifyRequest" } } } },
+        "responses": { "200": { "description": "OTP accepted" } }
+      }
+    },
+    "/api/auth/enable-2fa": {
+      "post": {
+        "summary": "Enable two-factor authentication",
+        "security": [{"bearerAuth":[]}],
+        "responses": { "200": { "description": "2FA enabled" } }
+      }
+    },
+    "/api/stations": {
+      "get": { "summary": "List gas stations", "security": [{"bearerAuth":[]}], "responses": { "200": { "description": "Array of stations" } } },
+      "post": {
+        "summary": "Create gas station",
+        "security": [{"bearerAuth":[]}],
+        "responses": { "201": { "description": "Station created" } }
+      }
+    },
+    "/api/subscriptions/renew": {
+      "post": {
+        "summary": "Renew subscription immediately",
+        "security": [{"bearerAuth":[]}],
+        "requestBody": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlanRequest" } } } },
+        "responses": { "201": { "description": "Subscription renewed" } }
+      }
+    },
+    "/api/tickets": {
+      "post": {
+        "summary": "Create support ticket",
+        "security": [{"bearerAuth":[]}],
+        "requestBody": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TicketPayload" } } } },
+        "responses": { "201": { "description": "Ticket created" } }
+      },
+      "get": {
+        "summary": "List all tickets for admins",
+        "security": [{"bearerAuth":[]}],
+        "responses": { "200": { "description": "Ticket list" } }
+      }
+    },
+    "/api/services/refuels/process": {
+      "post": {
+        "summary": "Compatibility endpoint for processing refuel",
+        "security": [{"bearerAuth":[]}],
+        "requestBody": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RefuelPayload" } } } },
+        "responses": { "201": { "description": "Refuel recorded" } }
+      }
+    },
+    "/api/services/car-washes/process": {
+      "post": {
+        "summary": "Compatibility endpoint for processing car wash",
+        "security": [{"bearerAuth":[]}],
+        "requestBody": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CarWashPayload" } } } },
+        "responses": { "201": { "description": "Car wash recorded" } }
+      }
+    },
+    "/api/services/maintenance/process": {
+      "post": {
+        "summary": "Compatibility endpoint for processing maintenance",
+        "security": [{"bearerAuth":[]}],
+        "requestBody": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/MaintenancePayload" } } } },
+        "responses": { "201": { "description": "Maintenance recorded" } }
+      }
+    },
+    "/api/admin/reports/export": {
+      "get": {
+        "summary": "CSV export for admin (revenue / daily_activity)",
+        "security": [{"bearerAuth":[]}],
+        "parameters": [
+          { "in": "query", "name": "type", "schema": { "type": "string" }, "description": "Type of report (revenue,daily_activity)", "required": true },
+          { "in": "query", "name": "period", "schema": { "type": "string" }, "description": "period filter (daily,monthly,yearly)" }
+        ],
+        "responses": { "200": { "description": "CSV file (text/csv)" } }
+      }
+    },
+    "/api/admin/system/maintenance": {
+      "post": {
+        "summary": "Schedule maintenance window and notify users",
+        "security": [{"bearerAuth":[]}],
+        "responses": { "200": { "description": "Maintenance scheduled" } }
+      }
+    }
+  },
+  "security": [ { "bearerAuth": [] } ]
+}
