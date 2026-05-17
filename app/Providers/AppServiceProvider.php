@@ -14,11 +14,11 @@ class AppServiceProvider extends ServiceProvider
         //
     }
 
-    /**
-     * Bootstrap any application services.
-     */
     public function boot(): void
     {
-        //
+        \Dedoc\Scramble\Scramble::auth(function ($request) {
+            // Allows everyone to access API documentation in production
+            return true;
+        });
     }
 }
