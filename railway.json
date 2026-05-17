@@ -3,5 +3,5 @@
   "build": {
     "builder": "NIXPACKS",
     "buildCommand": "composer install --no-dev --optimize-autoloader"
-  },
+  }
 }
