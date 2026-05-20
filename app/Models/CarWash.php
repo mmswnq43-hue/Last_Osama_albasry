@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class CarWash extends Model
 {
+    
     use HasFactory;
 
     public $timestamps = false;
