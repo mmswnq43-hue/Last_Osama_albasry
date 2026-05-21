@@ -8,8 +8,5 @@ cmds = [
   "php artisan storage:link"
 ]
 
-[phases.start]
-cmd = "php artisan migrate --force && php-fpm -D && nginx -g 'daemon off;'"
-
 [variables]
 NIXPACKS_PHP_ROOT_DIR = "/app/public"
