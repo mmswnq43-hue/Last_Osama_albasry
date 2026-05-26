@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\ElectronicCard;
 use App\Models\Refuel;
+use App\Models\SystemSetting;
 use App\Models\User;
 use App\Services\GasYemenNotificationService;
 use App\Services\GasYemenSubscriptionService;
@@ -114,8 +115,8 @@ class RefuelController extends Controller
             'priority_cards' => [
                 'total_active_cards' => $priorityCards->count(),
                 'unused_cards' => $priorityCards->where('is_used', false)->count(),
-                'progress_to_next_card' => min(100, $monthlyLiters / 500 * 100),
-                'fuel_until_next_card' => max(0, 500 - $monthlyLiters),
+                'progress_to_next_card' => min(100, $monthlyLiters / SystemSetting::get('priority_card_liters_threshold', 500) * 100),
+                'fuel_until_next_card' => max(0, SystemSetting::get('priority_card_liters_threshold', 500) - $monthlyLiters),
             ],
         ]);
     }

@@ -695,4 +695,217 @@ class AdminController extends Controller
 
         return response()->json($ticket->refresh());
     }
+
+    public function approveUser(Request $request, int $userId): JsonResponse
+    {
+        $this->ensureAdmin($request);
+
+        $user = User::query()->findOrFail($userId);
+        $user->forceFill([
+            'approval_status' => 'approved',
+            'is_active' => true,
+            'rejection_reason' => null,
+        ])->save();
+
+        Notification::create([
+            'user_id' => $user->id,
+            'title' => 'تم قبول حسابك',
+            'message' => 'مرحباً '.$user->full_name.'! تم قبول حسابك بنجاح. يمكنك الآن تسجيل الدخول واستخدام التطبيق.',
+            'notification_type' => 'account_approved',
+            'is_important' => true,
+        ]);
+
+        return response()->json(['message' => 'تم قبول المستخدم بنجاح']);
+    }
+
+    public function rejectUser(Request $request, int $userId): JsonResponse
+    {
+        $this->ensureAdmin($request);
+
+        $data = $request->validate([
+            'reason' => ['required', 'string', 'max:500'],
+        ]);
+
+        $user = User::query()->findOrFail($userId);
+        $user->forceFill([
+            'approval_status' => 'rejected',
+            'is_active' => false,
+            'rejection_reason' => $data['reason'],
+        ])->save();
+
+        Notification::create([
+            'user_id' => $user->id,
+            'title' => 'تم رفض حسابك',
+            'message' => 'نأسف، تم رفض حسابك. السبب: '.$data['reason'],
+            'notification_type' => 'account_rejected',
+            'is_important' => true,
+        ]);
+
+        return response()->json(['message' => 'تم رفض المستخدم']);
+    }
+
+    public function pendingUsers(Request $request): JsonResponse
+    {
+        $this->ensureAdmin($request);
+
+        $users = User::query()
+            ->where('approval_status', 'pending')
+            ->latest('created_at')
+            ->get()
+            ->map(function (User $user) {
+                $subscription = Subscription::query()
+                    ->where('user_id', $user->id)
+                    ->latest('created_at')
+                    ->first();
+
+                return [
+                    'id' => $user->id,
+                    'full_name' => $user->full_name,
+                    'phone' => $user->phone,
+                    'user_role' => $user->user_role,
+                    'vehicle_type' => $user->vehicle_type,
+                    'engine_number' => $user->engine_number,
+                    'avatar' => $user->avatar,
+                    'created_at' => $user->created_at,
+                    'subscription' => $subscription ? [
+                        'id' => $subscription->id,
+                        'plan_type' => $subscription->plan_type,
+                        'price' => $subscription->price,
+                        'status' => $subscription->status,
+                        'payment_receipt_image' => $subscription->payment_receipt_image,
+                        'created_at' => $subscription->created_at,
+                    ] : null,
+                ];
+            });
+
+        return response()->json($users->values());
+    }
+
+    public function allSubscriptions(Request $request): JsonResponse
+    {
+        $this->ensureAdmin($request);
+
+        $data = $request->validate([
+            'status' => ['nullable', 'string'],
+            'plan_type' => ['nullable', 'string'],
+            'page' => ['nullable', 'integer', 'min:1'],
+            'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],
+        ]);
+
+        $query = Subscription::query()->with('user:id,full_name,phone');
+
+        if (! empty($data['status'])) {
+            $query->where('status', $data['status']);
+        }
+        if (! empty($data['plan_type'])) {
+            $query->where('plan_type', $data['plan_type']);
+        }
+
+        $perPage = $data['per_page'] ?? 20;
+        $paginated = $query->latest('created_at')->paginate($perPage);
+
+        return response()->json([
+            'subscriptions' => $paginated->items(),
+            'total' => $paginated->total(),
+            'current_page' => $paginated->currentPage(),
+            'last_page' => $paginated->lastPage(),
+        ]);
+    }
+
+    public function updateStation(Request $request, int $id): JsonResponse
+    {
+        $this->ensureAdmin($request);
+
+        $data = $request->validate([
+            'station_name' => ['nullable', 'string', 'max:100'],
+            'location' => ['nullable', 'string', 'max:255'],
+            'latitude' => ['nullable', 'numeric'],
+            'longitude' => ['nullable', 'numeric'],
+            'is_active' => ['nullable', 'boolean'],
+        ]);
+
+        $station = GasStation::query()->findOrFail($id);
+        $station->forceFill(array_filter($data, fn($v) => $v !== null))->save();
+
+        return response()->json($station->refresh());
+    }
+
+    public function updateCarWashCenter(Request $request, int $id): JsonResponse
+    {
+        $this->ensureAdmin($request);
+
+        $data = $request->validate([
+            'center_name' => ['nullable', 'string', 'max:100'],
+            'location' => ['nullable', 'string', 'max:255'],
+            'latitude' => ['nullable', 'numeric'],
+            'longitude' => ['nullable', 'numeric'],
+            'is_active' => ['nullable', 'boolean'],
+        ]);
+
+        $center = CarWashCenter::query()->findOrFail($id);
+        $center->forceFill(array_filter($data, fn($v) => $v !== null))->save();
+
+        return response()->json($center->refresh());
+    }
+
+    public function updateMaintenanceCenter(Request $request, int $id): JsonResponse
+    {
+        $this->ensureAdmin($request);
+
+        $data = $request->validate([
+            'center_name' => ['nullable', 'string', 'max:100'],
+            'location' => ['nullable', 'string', 'max:255'],
+            'latitude' => ['nullable', 'numeric'],
+            'longitude' => ['nullable', 'numeric'],
+            'specialization' => ['nullable', 'string', 'max:100'],
+            'is_active' => ['nullable', 'boolean'],
+        ]);
+
+        $center = MaintenanceCenter::query()->findOrFail($id);
+        $center->forceFill(array_filter($data, fn($v) => $v !== null))->save();
+
+        return response()->json($center->refresh());
+    }
+
+    public function createUser(Request $request): JsonResponse
+    {
+        $this->ensureAdmin($request);
+
+        $data = $request->validate([
+            'full_name' => ['required', 'string', 'max:100'],
+            'phone' => ['required', 'string', 'max:20', 'unique:users,phone'],
+            'password' => ['required', 'string', 'min:6'],
+            'user_role' => ['required', 'string'],
+            'vehicle_type' => ['nullable', 'string', 'max:50'],
+            'engine_number' => ['nullable', 'string', 'max:50'],
+        ]);
+
+        $user = User::create([
+            'full_name' => $data['full_name'],
+            'phone' => $data['phone'],
+            'password_hash' => \Illuminate\Support\Facades\Hash::make($data['password']),
+            'user_role' => $data['user_role'],
+            'vehicle_type' => $data['vehicle_type'] ?? null,
+            'engine_number' => $data['engine_number'] ?? null,
+            'qr_code' => 'GHAZI:'.\Illuminate\Support\Str::upper(\Illuminate\Support\Str::random(32)),
+            'is_active' => true,
+            'approval_status' => 'approved',
+        ]);
+
+        return response()->json($user, 201);
+    }
+
+    public function updateUserRole(Request $request, int $userId): JsonResponse
+    {
+        $this->ensureAdmin($request);
+
+        $data = $request->validate([
+            'user_role' => ['required', 'string', 'in:customer,station_owner,car_wash_owner,maintenance_owner,admin,station_worker,car_wash_worker,maintenance_worker'],
+        ]);
+
+        $user = User::query()->findOrFail($userId);
+        $user->forceFill(['user_role' => $data['user_role']])->save();
+
+        return response()->json(['message' => 'تم تغيير دور المستخدم بنجاح', 'user_role' => $data['user_role']]);
+    }
 }

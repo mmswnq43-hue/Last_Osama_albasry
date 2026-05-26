@@ -1,0 +1,153 @@
+<div>
+    @if($successMessage)
+    <div style="background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:1.5px solid #86efac;border-radius:12px;padding:12px 16px;margin-bottom:18px;display:flex;align-items:center;gap:10px;">
+        <svg width="16" height="16" fill="none" stroke="#16a34a" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+        <span style="color:#15803d;font-weight:600;font-size:0.875rem;">{{ $successMessage }}</span>
+    </div>
+    @endif
+
+    {{-- Filters --}}
+    <div style="background:white;border-radius:14px;padding:14px 18px;margin-bottom:16px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;box-shadow:0 1px 8px rgba(0,0,0,0.05);border:1px solid #f1f5f9;">
+        <input wire:model.live.debounce.300ms="search" type="text" placeholder="🔍 بحث بالاسم أو رقم الهاتف..." class="input-field" style="flex:1;min-width:200px;">
+        <select wire:model.live="roleFilter" class="input-field">
+            <option value="">كل الأدوار</option>
+            <option value="customer">مستخدم</option>
+            <option value="station_owner">مالك محطة</option>
+            <option value="car_wash_owner">مالك مغسلة</option>
+            <option value="maintenance_owner">مالك مركز صيانة</option>
+            <option value="station_worker">موظف محطة</option>
+            <option value="admin">مدير</option>
+        </select>
+        <select wire:model.live="statusFilter" class="input-field">
+            <option value="">كل الحالات</option>
+            <option value="active">مفعّل</option>
+            <option value="inactive">موقوف</option>
+        </select>
+    </div>
+
+    {{-- Table --}}
+    <div style="background:white;border-radius:16px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.06);border:1px solid #f1f5f9;">
+        <div style="overflow-x:auto;">
+            <table style="width:100%;border-collapse:collapse;font-size:0.82rem;">
+                <thead>
+                    <tr style="background:linear-gradient(135deg,#f8faff,#eff6ff);">
+                        <th style="text-align:right;padding:12px 16px;color:#475569;font-weight:700;font-size:0.75rem;white-space:nowrap;">المستخدم</th>
+                        <th style="text-align:right;padding:12px 16px;color:#475569;font-weight:700;font-size:0.75rem;">الدور</th>
+                        <th style="text-align:right;padding:12px 16px;color:#475569;font-weight:700;font-size:0.75rem;">حالة الحساب</th>
+                        <th style="text-align:right;padding:12px 16px;color:#475569;font-weight:700;font-size:0.75rem;">حالة الموافقة</th>
+                        <th style="text-align:right;padding:12px 16px;color:#475569;font-weight:700;font-size:0.75rem;">تاريخ التسجيل</th>
+                        <th style="text-align:right;padding:12px 16px;color:#475569;font-weight:700;font-size:0.75rem;">الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($users as $user)
+                    <tr class="table-row" style="border-top:1px solid #f8faff;transition:background 0.15s;">
+                        <td style="padding:12px 16px;">
+                            <div style="display:flex;align-items:center;gap:10px;">
+                                <div style="width:36px;height:36px;background:linear-gradient(135deg,#f97316,#3b82f6);border-radius:10px;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:0.9rem;flex-shrink:0;">
+                                    {{ mb_substr($user->full_name, 0, 1) }}
+                                </div>
+                                <div>
+                                    <p style="font-weight:600;color:#1e293b;">{{ $user->full_name }}</p>
+                                    <p style="color:#94a3b8;font-size:0.75rem;" dir="ltr">{{ $user->phone }}</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td style="padding:12px 16px;">
+                            <span class="badge badge-blue">{{ $user->user_role }}</span>
+                        </td>
+                        <td style="padding:12px 16px;">
+                            @if($user->is_active)
+                                <span class="badge badge-green">● مفعّل</span>
+                            @else
+                                <span class="badge badge-red">● موقوف</span>
+                            @endif
+                        </td>
+                        <td style="padding:12px 16px;">
+                            @if($user->approval_status === 'approved')
+                                <span class="badge badge-green">مقبول</span>
+                            @elseif($user->approval_status === 'pending')
+                                <span class="badge badge-yellow">معلق</span>
+                            @else
+                                <span class="badge badge-red">مرفوض</span>
+                            @endif
+                        </td>
+                        <td style="padding:12px 16px;color:#94a3b8;font-size:0.75rem;">{{ $user->created_at?->format('Y-m-d') }}</td>
+                        <td style="padding:12px 16px;">
+                            <div style="display:flex;gap:8px;">
+                                <button wire:click="openUserDetails({{ $user->id }})"
+                                    style="padding:5px 12px;background:#eff6ff;color:#1d4ed8;border:none;border-radius:7px;font-size:0.75rem;font-weight:600;cursor:pointer;">
+                                    تفاصيل
+                                </button>
+                                <button wire:click="toggleStatus({{ $user->id }})"
+                                    style="padding:5px 12px;background:{{ $user->is_active ? '#fff5f5' : '#f0fdf4' }};color:{{ $user->is_active ? '#dc2626' : '#16a34a' }};border:none;border-radius:7px;font-size:0.75rem;font-weight:600;cursor:pointer;">
+                                    {{ $user->is_active ? 'إيقاف' : 'تفعيل' }}
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr><td colspan="6" style="padding:48px;text-align:center;color:#94a3b8;">لا يوجد مستخدمون</td></tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+        <div style="padding:12px 16px;border-top:1px solid #f1f5f9;">{{ $users->links() }}</div>
+    </div>
+
+    {{-- Details Modal --}}
+    @if($showModal === 'details' && $selectedUser)
+    <div class="modal-overlay">
+        <div class="modal-box" style="max-width:500px;max-height:90vh;overflow-y:auto;">
+            <div style="background:linear-gradient(135deg,#1e3a8a,#3b82f6);padding:20px 24px;display:flex;align-items:center;justify-content:space-between;">
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <div style="width:42px;height:42px;background:rgba(255,255,255,0.2);border-radius:12px;display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:1.1rem;">
+                        {{ mb_substr($selectedUser['full_name'], 0, 1) }}
+                    </div>
+                    <div>
+                        <h3 style="font-weight:700;color:white;font-size:1rem;">{{ $selectedUser['full_name'] }}</h3>
+                        <p style="color:rgba(255,255,255,0.7);font-size:0.75rem;" dir="ltr">{{ $selectedUser['phone'] }}</p>
+                    </div>
+                </div>
+                <button wire:click="closeModal" style="background:rgba(255,255,255,0.2);border:none;border-radius:8px;padding:6px;cursor:pointer;color:white;">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div style="padding:22px 24px;display:flex;flex-direction:column;gap:16px;">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:0.82rem;">
+                    <div style="background:#f8faff;border-radius:10px;padding:12px;">
+                        <p style="color:#94a3b8;font-size:0.72rem;font-weight:600;margin-bottom:4px;">نوع المركبة</p>
+                        <p style="font-weight:600;color:#1e293b;">{{ $selectedUser['vehicle_type'] ?? '-' }}</p>
+                    </div>
+                    <div style="background:#f8faff;border-radius:10px;padding:12px;">
+                        <p style="color:#94a3b8;font-size:0.72rem;font-weight:600;margin-bottom:4px;">رقم المحرك</p>
+                        <p style="font-weight:600;color:#1e293b;font-size:0.78rem;" dir="ltr">{{ $selectedUser['engine_number'] ?? '-' }}</p>
+                    </div>
+                </div>
+
+                @if($selectedUser['rejection_reason'])
+                <div style="background:#fff5f5;border:1px solid #fca5a5;border-radius:10px;padding:12px;">
+                    <p style="color:#dc2626;font-size:0.72rem;font-weight:700;margin-bottom:4px;">سبب الرفض</p>
+                    <p style="color:#7f1d1d;font-size:0.82rem;">{{ $selectedUser['rejection_reason'] }}</p>
+                </div>
+                @endif
+
+                <div style="border-top:1px solid #f1f5f9;padding-top:16px;">
+                    <p style="font-size:0.82rem;font-weight:700;color:#1e293b;margin-bottom:10px;">تغيير الدور</p>
+                    <div style="display:flex;gap:10px;">
+                        <select wire:model="newRole" class="input-field" style="flex:1;">
+                            <option value="customer">مستخدم عادي</option>
+                            <option value="station_owner">مالك محطة</option>
+                            <option value="car_wash_owner">مالك مغسلة</option>
+                            <option value="maintenance_owner">مالك مركز صيانة</option>
+                            <option value="station_worker">موظف محطة</option>
+                            <option value="admin">مدير النظام</option>
+                        </select>
+                        <button wire:click="updateRole" class="btn-primary">حفظ</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+</div>

@@ -150,20 +150,29 @@ Route::prefix('owner')->middleware('auth:sanctum')->group(function (): void {
 
 Route::prefix('admin')->middleware('auth:sanctum')->group(function (): void {
     Route::get('/users', [AdminController::class, 'users']);
+    Route::post('/users', [AdminController::class, 'createUser']);
+    Route::get('/users/pending', [AdminController::class, 'pendingUsers']);
     Route::get('/users/{userId}', [AdminController::class, 'userDetails']);
     Route::put('/users/{userId}/status', [AdminController::class, 'updateUserStatus']);
+    Route::put('/users/{userId}/role', [AdminController::class, 'updateUserRole']);
+    Route::put('/users/{userId}/approve', [AdminController::class, 'approveUser']);
+    Route::put('/users/{userId}/reject', [AdminController::class, 'rejectUser']);
     Route::post('/users/{userId}/reset-password', [AdminController::class, 'resetUserPassword']);
     Route::get('/stations', [AdminController::class, 'stations']);
     Route::post('/stations', [AdminController::class, 'createStation']);
+    Route::put('/stations/{id}', [AdminController::class, 'updateStation']);
     Route::delete('/stations/{id}', [AdminController::class, 'deleteStation']);
     Route::get('/car-wash-centers', [AdminController::class, 'carWashCenters']);
     Route::post('/car-wash-centers', [AdminController::class, 'createCarWashCenter']);
+    Route::put('/car-wash-centers/{id}', [AdminController::class, 'updateCarWashCenter']);
     Route::delete('/car-wash-centers/{id}', [AdminController::class, 'deleteCarWashCenter']);
     Route::get('/maintenance-centers', [AdminController::class, 'maintenanceCenters']);
     Route::post('/maintenance-centers', [AdminController::class, 'createMaintenanceCenter']);
+    Route::put('/maintenance-centers/{id}', [AdminController::class, 'updateMaintenanceCenter']);
     Route::delete('/maintenance-centers/{id}', [AdminController::class, 'deleteMaintenanceCenter']);
     Route::put('/businesses/{businessId}/approve', [AdminController::class, 'approveBusiness']);
     Route::put('/businesses/{businessId}/suspend', [AdminController::class, 'suspendBusiness']);
+    Route::get('/subscriptions', [AdminController::class, 'allSubscriptions']);
     Route::get('/transactions', [AdminController::class, 'transactions']);
     Route::get('/revenue/summary', [AdminController::class, 'revenueSummary']);
     Route::get('/analytics/user-behavior', [AdminController::class, 'userBehaviorAnalytics']);

@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\ElectronicCard;
 use App\Models\Subscription;
+use App\Models\SystemSetting;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
@@ -128,7 +129,8 @@ class GasYemenSubscriptionService
     {
         $subscription = $this->resetMonthlyLiters($subscription);
 
-        if ((float) $subscription->monthly_liters < 500) {
+        $threshold = SystemSetting::get('priority_card_liters_threshold', 500);
+        if ((float) $subscription->monthly_liters < $threshold) {
             return null;
         }
 
@@ -142,7 +144,8 @@ class GasYemenSubscriptionService
             return null;
         }
 
-        $expiresAt = Carbon::now()->endOfMonth()->setTime(23, 59, 59);
+        $validityDays = SystemSetting::get('priority_card_validity_days', 30);
+        $expiresAt = Carbon::now()->addDays($validityDays)->setTime(23, 59, 59);
 
         $card = ElectronicCard::create([
             'user_id' => $subscription->user_id,
@@ -155,7 +158,7 @@ class GasYemenSubscriptionService
         $this->notifications->createSystemNotification(
             $subscription->user_id,
             'كرت أولوية التعبئة',
-            'تم توليد كرت أولوية جديد بعد تجاوز 500 لتر هذا الشهر.',
+            'تم توليد كرت أولوية جديد بعد تجاوز '.$threshold.' لتر هذا الشهر.',
             'priority_card_generated',
         );
 

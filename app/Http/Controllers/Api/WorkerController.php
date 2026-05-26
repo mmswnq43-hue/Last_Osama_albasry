@@ -14,6 +14,7 @@ use App\Models\Refuel;
 use App\Models\SecurityLog;
 use App\Models\Subscription;
 use App\Models\User;
+use App\Models\SystemSetting;
 use App\Services\GeoService;
 use App\Services\GasYemenSubscriptionService;
 use Illuminate\Http\JsonResponse;
@@ -179,8 +180,8 @@ class WorkerController extends Controller
                 'plan_type' => $subscription->plan_type,
                 'status' => $subscription->status,
                 'monthly_liters_used' => (float) $subscription->monthly_liters,
-                'next_reward_at' => 500.0,
-                'progress' => min(((float) $subscription->monthly_liters / 500) * 100, 100.0),
+                'next_reward_at' => (float) SystemSetting::get('priority_card_liters_threshold', 500),
+                'progress' => min(((float) $subscription->monthly_liters / SystemSetting::get('priority_card_liters_threshold', 500)) * 100, 100.0),
             ],
             'priority_info' => [
                 'has_priority' => (bool) $priorityCard,

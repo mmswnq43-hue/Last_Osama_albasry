@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(composer show *)",
+      "Bash(composer require *)",
+      "Bash(php artisan *)",
+      "Bash(findstr -i \"DB_\")",
+      "Bash(php -l app/Models/SystemSetting.php)",
+      "Bash(php -l app/Livewire/Admin/Settings/SettingsPage.php)",
+      "Bash(npx vite *)"
+    ]
+  }
+}

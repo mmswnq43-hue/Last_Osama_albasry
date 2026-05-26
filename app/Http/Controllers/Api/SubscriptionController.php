@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\ElectronicCard;
 use App\Models\Subscription;
+use App\Models\SystemSetting;
 use App\Services\GasYemenNotificationService;
 use App\Services\GasYemenSubscriptionService;
 use Illuminate\Http\JsonResponse;
@@ -80,8 +81,8 @@ class SubscriptionController extends Controller
             'subscription_id' => $subscription->id,
             'plan_type' => $subscription->plan_type,
             'monthly_fuel_used' => $monthlyLiters,
-            'fuel_until_priority_card' => max(0, 500 - $monthlyLiters),
-            'progress_to_priority_card' => min(100, $monthlyLiters / 500 * 100),
+            'fuel_until_priority_card' => max(0, SystemSetting::get('priority_card_liters_threshold', 500) - $monthlyLiters),
+            'progress_to_priority_card' => min(100, $monthlyLiters / SystemSetting::get('priority_card_liters_threshold', 500) * 100),
             'active_priority_cards' => $priorityCards,
             'last_monthly_reset' => $subscription->last_reset_date,
             'end_date' => $subscription->end_date,

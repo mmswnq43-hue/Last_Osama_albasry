@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\ElectronicCard;
 use App\Models\GasStation;
+use App\Models\SystemSetting;
 use App\Services\GasYemenNotificationService;
 use App\Services\GasYemenSubscriptionService;
 use Illuminate\Http\JsonResponse;
@@ -86,8 +87,8 @@ class ElectronicCardController extends Controller
         return response()->json([
             'active_priority_cards' => $activeCards->count(),
             'monthly_fuel_used' => $monthlyLiters,
-            'fuel_until_next_card' => max(0, 500 - $monthlyLiters),
-            'progress_to_next_card' => $monthlyLiters > 0 ? ($monthlyLiters / 500) * 100 : 0,
+            'fuel_until_next_card' => max(0, SystemSetting::get('priority_card_liters_threshold', 500) - $monthlyLiters),
+            'progress_to_next_card' => $monthlyLiters > 0 ? ($monthlyLiters / SystemSetting::get('priority_card_liters_threshold', 500)) * 100 : 0,
             'cards' => $activeCards->map(fn (ElectronicCard $card) => [
                 'card_number' => $card->card_number,
                 'expires_at' => $card->expires_at,

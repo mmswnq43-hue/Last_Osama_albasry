@@ -25,6 +25,8 @@ class User extends Authenticatable
         'phone_verified',
         'two_factor_enabled',
         'account_locked',
+        'approval_status',
+        'rejection_reason',
         'last_location_lat',
         'last_location_lon',
         'last_location_update',
@@ -57,6 +59,7 @@ class User extends Authenticatable
             'last_location_update' => 'datetime',
             'created_at' => 'datetime',
             'updated_at' => 'datetime',
+            'approval_status' => 'string',
         ];
     }
 

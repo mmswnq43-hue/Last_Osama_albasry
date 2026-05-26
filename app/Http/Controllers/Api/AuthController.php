@@ -31,7 +31,8 @@ class AuthController extends Controller
             'engine_number' => $data['engine_number'] ?? null,
             'user_role' => $data['user_role'] ?? 'customer',
             'qr_code' => 'GHAZI:'.Str::upper(Str::random(32)),
-            'is_active' => true,
+            'is_active' => false,
+            'approval_status' => 'pending',
         ]);
 
         SecurityLog::create([
@@ -70,6 +71,12 @@ class AuthController extends Controller
             return response()->json(['detail' => 'بيانات الدخول غير صحيحة'], 401);
         }
 
+        if ($user->approval_status === 'pending') {
+            return response()->json(['detail' => 'حسابك قيد المراجعة، يرجى الانتظار حتى يتم قبولك من قِبَل الإدارة'], 403);
+        }
+        if ($user->approval_status === 'rejected') {
+            return response()->json(['detail' => 'تم رفض حسابك. السبب: '.($user->rejection_reason ?? 'لم يُحدد سبب')], 403);
+        }
         abort_if(! $user->is_active, 400, 'الحساب غير نشط');
 
         $token = $user->createToken($data['device_info'] ?? 'mobile')->plainTextToken;
