@@ -2,22 +2,22 @@
 
 namespace App\Providers;
 
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     */
-    public function register(): void
-    {
-        //
-    }
+    public function register(): void {}
 
     public function boot(): void
     {
-        \Illuminate\Support\Facades\Gate::define('viewApiDocs', function ($user = null) {
-            // Allows everyone (including guests) to access API documentation in production
+        // Force HTTPS when behind Railway's proxy
+        if ($this->app->environment('production')) {
+            URL::forceScheme('https');
+        }
+
+        Gate::define('viewApiDocs', function ($user = null) {
             return true;
         });
     }
