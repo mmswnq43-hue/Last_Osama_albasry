@@ -13,11 +13,12 @@ class ProductionSeeder extends Seeder
     public function run(): void
     {
         // Admin user — safe to run multiple times
-        User::firstOrCreate(
-            ['phone' => '777777777'],
+        $admin = User::firstOrCreate(
+            ['phone' => '770794503'],
             [
-                'full_name'       => 'Admin User',
-                'password_hash'   => Hash::make('password'),
+                'full_name'       => 'Admin',
+                'email'           => 'm.mosonaq@gmail.com',
+                'password_hash'   => Hash::make('770794503'),
                 'user_role'       => 'admin',
                 'qr_code'         => 'QR-ADMIN-' . strtoupper(Str::random(8)),
                 'is_active'       => true,
@@ -25,6 +26,11 @@ class ProductionSeeder extends Seeder
                 'approval_status' => 'approved',
             ]
         );
+
+        // Ensure email is set even if user already existed
+        if (! $admin->email) {
+            $admin->update(['email' => 'm.mosonaq@gmail.com']);
+        }
 
         // System settings defaults
         $settings = [
@@ -36,6 +42,6 @@ class ProductionSeeder extends Seeder
             SystemSetting::firstOrCreate(['key' => $s['key']], $s);
         }
 
-        $this->command->info('✅ Production seed done — admin: 777777777 / password');
+        $this->command->info('✅ Production seed done — admin: 770794503 / 770794503');
     }
 }

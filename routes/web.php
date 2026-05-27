@@ -1,6 +1,8 @@
 <?php
 
 use App\Livewire\Admin\Auth\LoginPage;
+use App\Livewire\Admin\Auth\ForgotPasswordPage;
+use App\Livewire\Admin\Auth\ResetPasswordPage;
 use App\Livewire\Admin\DashboardPage;
 use App\Livewire\Admin\Users\PendingApprovalsPage;
 use App\Livewire\Admin\Users\UsersListPage;
@@ -20,6 +22,8 @@ Route::get('/', function () {
 
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/login', LoginPage::class)->name('login')->middleware('guest');
+    Route::get('/forgot-password', ForgotPasswordPage::class)->name('password.forgot')->middleware('guest');
+    Route::get('/reset-password', ResetPasswordPage::class)->name('password.reset')->middleware('guest');
 
     Route::post('/logout', function () {
         auth()->logout();

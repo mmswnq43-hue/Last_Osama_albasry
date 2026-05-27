@@ -17,7 +17,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $roles = [
-            'admin' => '777777777',
+            'admin' => '770794503',
             'customer' => '770000001',
             'station_owner' => '770000002',
             'car_wash_owner' => '770000003',

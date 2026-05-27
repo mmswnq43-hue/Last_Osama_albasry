@@ -13,24 +13,25 @@ use Livewire\Component;
 #[Title('تسجيل الدخول - غازي')]
 class LoginPage extends Component
 {
-    public string $phone = '';
+    public string $email = '';
     public string $password = '';
     public string $error = '';
 
     public function login(): void
     {
         $this->validate([
-            'phone' => 'required|string',
+            'email'    => 'required|email',
             'password' => 'required|string',
         ], [
-            'phone.required' => 'رقم الهاتف مطلوب',
+            'email.required'    => 'البريد الإلكتروني مطلوب',
+            'email.email'       => 'صيغة البريد الإلكتروني غير صحيحة',
             'password.required' => 'كلمة المرور مطلوبة',
         ]);
 
-        $user = User::where('phone', $this->phone)->first();
+        $user = User::where('email', $this->email)->first();
 
         if (! $user || ! Hash::check($this->password, $user->password_hash)) {
-            $this->error = 'رقم الهاتف أو كلمة المرور غير صحيحة';
+            $this->error = 'البريد الإلكتروني أو كلمة المرور غير صحيحة';
             return;
         }
 

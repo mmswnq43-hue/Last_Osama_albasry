@@ -24,15 +24,22 @@
 
             <form wire:submit="login" style="display:flex;flex-direction:column;gap:16px;">
                 <div>
-                    <label style="display:block;color:rgba(255,255,255,0.7);font-size:0.82rem;font-weight:600;margin-bottom:7px;">رقم الهاتف</label>
-                    <input type="text" wire:model="phone" placeholder="أدخل رقم الهاتف" dir="ltr"
+                    <label style="display:block;color:rgba(255,255,255,0.7);font-size:0.82rem;font-weight:600;margin-bottom:7px;">البريد الإلكتروني</label>
+                    <input type="email" wire:model="email" placeholder="أدخل البريد الإلكتروني" dir="ltr"
                         style="width:100%;background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,255,255,0.1);color:white;border-radius:11px;padding:11px 14px;font-size:0.875rem;font-family:'Tajawal',sans-serif;outline:none;transition:border-color 0.2s;box-sizing:border-box;"
                         onfocus="this.style.borderColor='#f97316';this.style.background='rgba(249,115,22,0.08)'"
                         onblur="this.style.borderColor='rgba(255,255,255,0.1)';this.style.background='rgba(255,255,255,0.06)'">
-                    @error('phone') <span style="color:#fca5a5;font-size:0.75rem;margin-top:4px;display:block;">{{ $message }}</span> @enderror
+                    @error('email') <span style="color:#fca5a5;font-size:0.75rem;margin-top:4px;display:block;">{{ $message }}</span> @enderror
                 </div>
                 <div>
-                    <label style="display:block;color:rgba(255,255,255,0.7);font-size:0.82rem;font-weight:600;margin-bottom:7px;">كلمة المرور</label>
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;">
+                        <label style="color:rgba(255,255,255,0.7);font-size:0.82rem;font-weight:600;">كلمة المرور</label>
+                        <a href="{{ route('admin.password.forgot') }}" wire:navigate
+                           style="color:#f97316;font-size:0.78rem;text-decoration:none;opacity:0.85;"
+                           onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.85'">
+                            نسيت كلمة المرور؟
+                        </a>
+                    </div>
                     <input type="password" wire:model="password" placeholder="أدخل كلمة المرور"
                         style="width:100%;background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,255,255,0.1);color:white;border-radius:11px;padding:11px 14px;font-size:0.875rem;font-family:'Tajawal',sans-serif;outline:none;transition:border-color 0.2s;box-sizing:border-box;"
                         onfocus="this.style.borderColor='#f97316';this.style.background='rgba(249,115,22,0.08)'"
