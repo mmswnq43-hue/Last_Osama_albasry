@@ -1,0 +1,18 @@
+بيانات حسابات النظام (Gas Yemen)
+================================
+
+كلمة المرور الموحدة لجميع الحسابات: password
+
+| الدور (Role)            | رقم الهاتف (Phone) | الاسم (Name)                |
+|-------------------------|-------------------|-----------------------------|
+| Admin                   | 777777777         | Admin User                  |
+| Customer                | 770000001         | Customer User               |
+| Station Owner           | 770000002         | Station Owner User          |
+| Car Wash Owner          | 770000003         | Car Wash Owner User         |
+| Maintenance Owner       | 770000004         | Maintenance Owner User      |
+| Station Worker          | 770000005         | Station Worker User         |
+| Car Wash Worker         | 770000006         | Car Wash Worker User        |
+| Maintenance Worker      | 770000007         | Maintenance Worker User     |
+
+ملاحظة: النظام يستخدم رقم الهاتف لتسجيل الدخول بدلاً من البريد الإلكتروني.
+تم إنشاء هذه الحسابات برمجياً في ملف DatabaseSeeder.php.

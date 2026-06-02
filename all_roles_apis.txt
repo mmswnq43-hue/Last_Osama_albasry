@@ -1,0 +1,86 @@
+دليل الـ APIs الشامل لنظام غازي (حسب الأدوار)
+==============================================
+
+هذا الملف موجه لمطوري الفرونت-إند (تطبيقات موبايل ومواقع) لتسهيل فلترة الروابط بناءً على دور المستخدم.
+
+1. روابط عامة ومصادقة (Public & Auth)
+--------------------------------------
+هذه الروابط تستخدم في جميع التطبيقات للبداية:
+- POST /api/auth/register : تسجيل حساب جديد (للعملاء والملاك).
+- POST /api/auth/login    : تسجيل الدخول (عن طريق رقم الهاتف).
+- POST /api/auth/verify   : التحقق من الكود (OTP).
+- GET  /api/auth/me       : بيانات المستخدم الحالي (يتطلب تسجيل دخول).
+- POST /api/auth/logout   : تسجيل الخروج.
+- GET  /api/health        : حالة النظام.
+- GET  /api/info          : معلومات النظام.
+
+2. تطبيق العميل (Customer App)
+-------------------------------
+الروابط الأساسية لتطبيق المواطن:
+- GET  /api/user/profile          : الملف الشخصي.
+- PUT  /api/user/profile          : تحديث البيانات.
+- GET  /api/user/stats            : إحصائيات العميل (إجمالي التوفير، التعبئة، إلخ).
+- GET  /api/user/history/refuels  : سجل التعبئة.
+- GET  /api/user/history/car-washes: سجل غسيل السيارات.
+- GET  /api/user/history/maintenance: سجل الصيانة.
+- GET  /api/user/qr-codes         : عرض رموز QR الحالية للخدمات.
+- POST /api/user/qr-codes/generate: توليد رمز QR جديد لخدمة معينة (وقود/غسيل/صيانة).
+- GET  /api/subscriptions/plans   : عرض باقات الاشتراك المتاحة.
+- POST /api/subscriptions/subscribe: طلب اشتراك في باقة.
+- GET  /api/stations/nearby       : البحث عن محطات قريبة.
+- GET  /api/car-washes/nearby     : البحث عن مغاسل قريبة.
+- POST /api/user/tickets          : إنشاء تذكرة دعم فني.
+
+3. تطبيق/لوحة تحكم المالك (Owner Dashboard)
+-------------------------------------------
+أ) روابط مشتركة لكل الملاك:
+- GET  /api/owner/overview     : نظرة عامة على النشاط التجاري والإحصائيات.
+- GET  /api/owner/my-employees : قائمة الموظفين وإدارتهم.
+- POST /api/owner/employees    : إضافة موظف جديد للمنشأة.
+- GET  /api/owner/reports/revenue: تقارير الأرباح.
+
+ب) خاص بمالك المحطة (Station Owner):
+- GET  /api/owner/my-stations                 : إدارة المحطات التابعة له.
+- GET  /api/owner/stations/{id}/today-refuels : إحصائيات التعبئة اليومية.
+
+ج) خاص بمالك المغسلة (Car Wash Owner):
+- GET  /api/owner/my-car-washes               : إدارة مراكز الغسيل التابعة له.
+- GET  /api/owner/car-washes/{id}/today-washes: إحصائيات الغسيل اليومية.
+
+د) خاص بمالك الصيانة (Maintenance Owner):
+- GET  /api/owner/my-maintenance-centers       : إدارة مراكز الصيانة التابعة له.
+- GET  /api/owner/maintenance/{id}/today-services: إحصائيات الصيانة اليومية.
+
+4. تطبيق العامل (Worker App)
+-----------------------------
+أ) روابط مشتركة للعمال:
+- GET  /api/worker/overview    : إحصائيات العمل اليومية للعامل.
+- GET  /api/worker/my-workplace: بيانات مكان العمل الحالي (المحطة/المركز).
+
+ب) عامل المحطة (Station Worker):
+- POST /api/worker/services/refuels/validate-qr: فحص رمز QR للعميل قبل التعبئة.
+- POST /api/worker/services/refuels/process    : تسجيل عملية التعبئة الفعلية.
+
+ج) عامل المغسلة (Car Wash Worker):
+- POST /api/worker/services/car-washes/validate-qr: فحص صلاحية غسيل السيارة.
+- POST /api/worker/services/car-washes/process    : تسجيل عملية الغسيل.
+
+د) عامل الصيانة (Maintenance Worker):
+- POST /api/worker/services/maintenance/validate-qr: فحص رصيد الصيانة للعميل.
+- POST /api/worker/services/maintenance/process    : تسجيل عملية الصيانة.
+
+5. لوحة تحكم المسؤول (Admin Dashboard)
+--------------------------------------
+- GET  /api/admin/users             : إدارة جميع المستخدمين في النظام.
+- PUT  /api/admin/users/{id}/status : تفعيل أو تعطيل حساب مستخدم.
+- GET  /api/admin/stations          : إدارة جميع محطات الوقود (اعتماد/حذف).
+- PUT  /api/admin/businesses/{id}/approve: اعتماد طلبات فتح منشآت جديدة.
+- GET  /api/admin/transactions      : مراقبة جميع الحركات المالية في النظام.
+- GET  /api/admin/security/threats  : مراقبة التهديدات الأمنية ومحاولات الاختراق.
+- GET  /api/admin/analytics/user-behavior: تحليلات سلوك المستخدمين والنمو.
+- GET  /api/admin/tickets           : إدارة تذاكر الدعم الفني والرد عليها.
+
+ملاحظات هامة للمطور:
+1. جميع الروابط (ما عدا Login/Register) تتطلب ترويسة: Authorization: Bearer {token}.
+2. لغة الردود الافتراضية هي العربية.
+3. يتم التحقق من الصلاحيات (Roles) تلقائياً في السيرفر؛ إذا حاول عامل دخول رابط أدمن سيظهر خطأ 403.

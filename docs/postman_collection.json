@@ -1,0 +1,44 @@
+{
+  "info": {
+    "name": "Gas_Yemen_Laravel API - Demo",
+    "_postman_id": "gas-yemen-laravel-demo",
+    "description": "Basic Postman collection for demo endpoints (auth, owner, worker, admin exports)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth - Login",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{ \"phone\": \"700000001\", \"password\": \"password\" }"
+        },
+        "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api","auth","login"] }
+      }
+    },
+    {
+      "name": "Worker - Process Car Wash",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": { "mode": "raw", "raw": "{ \"user_id\": 12, \"center_id\": 1, \"wash_type\": \"خارجي\", \"qr_code\": \"GHAZI:demo\" }" },
+        "url": { "raw": "{{baseUrl}}/api/worker/services/car-washes/process", "host": ["{{baseUrl}}"], "path": ["api","worker","services","car-washes","process"] }
+      }
+    },
+    {
+      "name": "Admin - Export Revenue CSV",
+      "request": {
+        "method": "GET",
+        "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" } ],
+        "url": { "raw": "{{baseUrl}}/api/admin/reports/export?type=revenue&period=monthly", "host": ["{{baseUrl}}"], "path": ["api","admin","reports","export"], "query": [ { "key": "type", "value": "revenue" }, { "key": "period", "value": "monthly" } ] }
+      }
+    }
+  ]
+}
