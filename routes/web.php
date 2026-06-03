@@ -17,6 +17,12 @@ use App\Livewire\Admin\Settings\SettingsPage;
 use App\Livewire\Admin\BankAccounts\BankAccountsPage;
 use App\Livewire\Customer\RegisterPage;
 use App\Livewire\Customer\StatusPage;
+use App\Livewire\Customer\DashboardPage as CustomerDashboardPage;
+use App\Livewire\Customer\SubscriptionsPage;
+use App\Livewire\Customer\MapPage;
+use App\Livewire\Customer\NotificationsPage;
+use App\Livewire\Customer\SettingsPage as CustomerSettingsPage;
+use App\Livewire\Customer\HistoryPage;
 use App\Http\Controllers\Customer\RegistrationController;
 use App\Http\Controllers\Customer\SubscriptionController;
 use App\Http\Controllers\Admin\AdvertisementController;
@@ -79,7 +85,13 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
 
 // ── Customer protected pages ───────────────────────────────────
 Route::prefix('customer')->name('customer.')->middleware('auth')->group(function () {
-    Route::get('/status',       StatusPage::class)->name('status');
-    Route::get('/pay',          [SubscriptionController::class, 'showPay'])->name('pay');
-    Route::post('/subscription',[SubscriptionController::class, 'store'])->name('subscription.store');
+    Route::get('/status',        StatusPage::class)->name('status');
+    Route::get('/dashboard',     CustomerDashboardPage::class)->name('dashboard');
+    Route::get('/subscriptions', SubscriptionsPage::class)->name('subscriptions');
+    Route::get('/map',           MapPage::class)->name('map');
+    Route::get('/notifications', NotificationsPage::class)->name('notifications');
+    Route::get('/settings',      CustomerSettingsPage::class)->name('settings');
+    Route::get('/history',       HistoryPage::class)->name('history');
+    Route::get('/pay',           [SubscriptionController::class, 'showPay'])->name('pay');
+    Route::post('/subscription', [SubscriptionController::class, 'store'])->name('subscription.store');
 });
