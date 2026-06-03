@@ -6,6 +6,7 @@ use App\Livewire\Admin\Auth\ResetPasswordPage;
 use App\Livewire\Admin\DashboardPage;
 use App\Livewire\Admin\Users\PendingApprovalsPage;
 use App\Livewire\Admin\Users\UsersListPage;
+use App\Livewire\Admin\Users\OwnersListPage;
 use App\Livewire\Admin\Subscriptions\SubscriptionsListPage;
 use App\Livewire\Admin\Businesses\StationsPage;
 use App\Livewire\Admin\Businesses\CarWashesPage;
@@ -56,6 +57,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::get('/dashboard',     DashboardPage::class)->name('dashboard');
     Route::get('/users/pending', PendingApprovalsPage::class)->name('users.pending');
     Route::get('/users',         UsersListPage::class)->name('users.index');
+    Route::get('/owners',        OwnersListPage::class)->name('owners.index');
     Route::get('/subscriptions', SubscriptionsListPage::class)->name('subscriptions.index');
     Route::get('/stations',      StationsPage::class)->name('stations.index');
     Route::get('/car-washes',    CarWashesPage::class)->name('carwashes.index');
