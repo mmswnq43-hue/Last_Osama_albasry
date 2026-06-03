@@ -85,6 +85,15 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::put('/ads/{ad}',      [AdvertisementController::class, 'update'])->name('ads.update');
 });
 
+// ── Owner protected pages ─────────────────────────────────────
+Route::prefix('owner')->name('owner.')->middleware(['auth', 'owner'])->group(function () {
+    Route::get('/dashboard', \App\Livewire\Owner\DashboardPage::class)->name('dashboard');
+    Route::get('/stations', \App\Livewire\Owner\StationsPage::class)->name('stations');
+    Route::get('/employees', \App\Livewire\Owner\EmployeesPage::class)->name('employees');
+    Route::get('/refuels', \App\Livewire\Owner\RefuelsPage::class)->name('refuels');
+    Route::get('/reports', \App\Livewire\Owner\ReportsPage::class)->name('reports');
+});
+
 // ── Customer protected pages ───────────────────────────────────
 Route::prefix('customer')->name('customer.')->middleware('auth')->group(function () {
     Route::get('/status',        StatusPage::class)->name('status');

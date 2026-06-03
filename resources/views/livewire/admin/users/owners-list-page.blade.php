@@ -91,10 +91,11 @@
         <div style="padding:12px 16px;border-top:1px solid #f1f5f9;">{{ $owners->links() }}</div>
     </div>
 
-    {{-- Create Owner Modal --}}
+    {{-- Create Owner Modal (2-step) --}}
     @if($showModal === 'create')
     <div class="modal-overlay">
-        <div class="modal-box" style="max-width:480px;">
+        <div class="modal-box" style="max-width:540px;">
+            {{-- Header --}}
             <div style="background:linear-gradient(135deg,#7c3aed,#6d28d9);padding:20px 24px;display:flex;align-items:center;justify-content:space-between;">
                 <div style="display:flex;align-items:center;gap:12px;">
                     <div style="width:40px;height:40px;background:rgba(255,255,255,0.2);border-radius:12px;display:flex;align-items:center;justify-content:center;">
@@ -106,10 +107,34 @@
                     <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
             </div>
-            <div style="padding:22px 24px;display:flex;flex-direction:column;gap:14px;">
+
+            {{-- Step Indicator --}}
+            <div style="padding:16px 24px;background:#faf5ff;border-bottom:1px solid #ede9fe;display:flex;align-items:center;justify-content:center;gap:0;">
+                {{-- Step 1 --}}
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <div style="width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.8rem;
+                        background:{{ $createStep >= 1 ? 'linear-gradient(135deg,#7c3aed,#6d28d9)' : '#e2e8f0' }};
+                        color:{{ $createStep >= 1 ? 'white' : '#94a3b8' }};">1</div>
+                    <span style="font-size:0.78rem;font-weight:600;color:{{ $createStep >= 1 ? '#7c3aed' : '#94a3b8' }};">بيانات المالك</span>
+                </div>
+                {{-- Connector --}}
+                <div style="width:48px;height:2px;margin:0 8px;background:{{ $createStep >= 2 ? 'linear-gradient(to left,#7c3aed,#6d28d9)' : '#e2e8f0' }};border-radius:2px;"></div>
+                {{-- Step 2 --}}
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <div style="width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.8rem;
+                        background:{{ $createStep >= 2 ? 'linear-gradient(135deg,#7c3aed,#6d28d9)' : '#e2e8f0' }};
+                        color:{{ $createStep >= 2 ? 'white' : '#94a3b8' }};">2</div>
+                    <span style="font-size:0.78rem;font-weight:600;color:{{ $createStep >= 2 ? '#7c3aed' : '#94a3b8' }};">بيانات المحطة</span>
+                </div>
+            </div>
+
+            <div style="padding:22px 24px;display:flex;flex-direction:column;gap:14px;max-height:60vh;overflow-y:auto;">
                 @if($createError)
                 <div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:10px;padding:10px 14px;color:#dc2626;font-size:0.82rem;">{{ $createError }}</div>
                 @endif
+
+                {{-- Step 1: Owner Data --}}
+                @if($createStep === 1)
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
                     <div style="grid-column:1/-1;">
                         <label style="display:block;color:#374151;font-size:0.82rem;font-weight:600;margin-bottom:5px;">الاسم الكامل <span style="color:#dc2626;">*</span></label>
@@ -122,8 +147,18 @@
                         @error('createForm.phone') <span style="color:#dc2626;font-size:0.75rem;margin-top:3px;display:block;">{{ $message }}</span> @enderror
                     </div>
                     <div>
+                        <label style="display:block;color:#374151;font-size:0.82rem;font-weight:600;margin-bottom:5px;">رقم الهوية الوطنية</label>
+                        <input wire:model="createForm.national_id" type="text" class="input-field" placeholder="10 أرقام" dir="ltr" autocomplete="off">
+                        @error('createForm.national_id') <span style="color:#dc2626;font-size:0.75rem;margin-top:3px;display:block;">{{ $message }}</span> @enderror
+                    </div>
+                    <div style="grid-column:1/-1;">
                         <label style="display:block;color:#374151;font-size:0.82rem;font-weight:600;margin-bottom:5px;">البريد الإلكتروني</label>
                         <input wire:model="createForm.email" type="email" class="input-field" placeholder="email@example.com" dir="ltr" autocomplete="off">
+                        @error('createForm.email') <span style="color:#dc2626;font-size:0.75rem;margin-top:3px;display:block;">{{ $message }}</span> @enderror
+                    </div>
+                    <div style="grid-column:1/-1;">
+                        <label style="display:block;color:#374151;font-size:0.82rem;font-weight:600;margin-bottom:5px;">العنوان</label>
+                        <textarea wire:model="createForm.address" class="input-field" placeholder="العنوان التفصيلي" rows="2" style="resize:none;"></textarea>
                     </div>
                     <div style="grid-column:1/-1;">
                         <label style="display:block;color:#374151;font-size:0.82rem;font-weight:600;margin-bottom:5px;">كلمة المرور <span style="color:#dc2626;">*</span></label>
@@ -131,17 +166,98 @@
                         @error('createForm.password') <span style="color:#dc2626;font-size:0.75rem;margin-top:3px;display:block;">{{ $message }}</span> @enderror
                     </div>
                 </div>
-                <div style="background:#faf5ff;border-radius:10px;padding:10px 14px;font-size:0.78rem;color:#64748b;border:1px solid #ede9fe;">
-                    💡 سيتم إنشاء الحساب بدور <strong style="color:#7c3aed;">مالك محطة</strong> بحالة مقبول ومفعّل مباشرةً.
+                @endif
+
+                {{-- Step 2: Station Data --}}
+                @if($createStep === 2)
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                    <div style="grid-column:1/-1;">
+                        <label style="display:block;color:#374151;font-size:0.82rem;font-weight:600;margin-bottom:5px;">اسم المحطة <span style="color:#dc2626;">*</span></label>
+                        <input wire:model="createForm.station_name" type="text" class="input-field" placeholder="اسم محطة الوقود" autocomplete="off">
+                        @error('createForm.station_name') <span style="color:#dc2626;font-size:0.75rem;margin-top:3px;display:block;">{{ $message }}</span> @enderror
+                    </div>
+                    <div>
+                        <label style="display:block;color:#374151;font-size:0.82rem;font-weight:600;margin-bottom:5px;">المدينة <span style="color:#dc2626;">*</span></label>
+                        <input wire:model="createForm.city" type="text" class="input-field" placeholder="الرياض" autocomplete="off">
+                        @error('createForm.city') <span style="color:#dc2626;font-size:0.75rem;margin-top:3px;display:block;">{{ $message }}</span> @enderror
+                    </div>
+                    <div>
+                        <label style="display:block;color:#374151;font-size:0.82rem;font-weight:600;margin-bottom:5px;">الحي</label>
+                        <input wire:model="createForm.district" type="text" class="input-field" placeholder="اسم الحي" autocomplete="off">
+                        @error('createForm.district') <span style="color:#dc2626;font-size:0.75rem;margin-top:3px;display:block;">{{ $message }}</span> @enderror
+                    </div>
+                    <div>
+                        <label style="display:block;color:#374151;font-size:0.82rem;font-weight:600;margin-bottom:5px;">رقم الترخيص</label>
+                        <input wire:model="createForm.license_number" type="text" class="input-field" placeholder="رقم الترخيص" dir="ltr" autocomplete="off">
+                        @error('createForm.license_number') <span style="color:#dc2626;font-size:0.75rem;margin-top:3px;display:block;">{{ $message }}</span> @enderror
+                    </div>
+                    <div>
+                        <label style="display:block;color:#374151;font-size:0.82rem;font-weight:600;margin-bottom:5px;">عدد المضخات <span style="color:#dc2626;">*</span></label>
+                        <input wire:model="createForm.pumps_count" type="number" class="input-field" min="1" max="100" placeholder="1" dir="ltr">
+                        @error('createForm.pumps_count') <span style="color:#dc2626;font-size:0.75rem;margin-top:3px;display:block;">{{ $message }}</span> @enderror
+                    </div>
+                    <div>
+                        <label style="display:block;color:#374151;font-size:0.82rem;font-weight:600;margin-bottom:5px;">تاريخ الإصدار</label>
+                        <input wire:model="createForm.license_issue_date" type="date" class="input-field" dir="ltr">
+                        @error('createForm.license_issue_date') <span style="color:#dc2626;font-size:0.75rem;margin-top:3px;display:block;">{{ $message }}</span> @enderror
+                    </div>
+                    <div>
+                        <label style="display:block;color:#374151;font-size:0.82rem;font-weight:600;margin-bottom:5px;">تاريخ الانتهاء</label>
+                        <input wire:model="createForm.license_expiry_date" type="date" class="input-field" dir="ltr">
+                        @error('createForm.license_expiry_date') <span style="color:#dc2626;font-size:0.75rem;margin-top:3px;display:block;">{{ $message }}</span> @enderror
+                    </div>
+                    {{-- Fuel Types --}}
+                    <div style="grid-column:1/-1;">
+                        <label style="display:block;color:#374151;font-size:0.82rem;font-weight:600;margin-bottom:8px;">أنواع الوقود</label>
+                        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                            @foreach(['91' => 'بنزين 91', '95' => 'بنزين 95', 'diesel' => 'ديزل'] as $value => $label)
+                            <label style="display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:20px;border:1.5px solid {{ in_array($value, $createForm['fuel_types'] ?? []) ? '#7c3aed' : '#e2e8f0' }};background:{{ in_array($value, $createForm['fuel_types'] ?? []) ? '#ede9fe' : 'white' }};cursor:pointer;font-size:0.8rem;font-weight:600;color:{{ in_array($value, $createForm['fuel_types'] ?? []) ? '#6d28d9' : '#64748b' }};transition:all 0.15s;">
+                                <input wire:model="createForm.fuel_types" type="checkbox" value="{{ $value }}" style="accent-color:#7c3aed;">
+                                {{ $label }}
+                            </label>
+                            @endforeach
+                        </div>
+                    </div>
+                    <div>
+                        <label style="display:block;color:#374151;font-size:0.82rem;font-weight:600;margin-bottom:5px;">خط العرض (Latitude)</label>
+                        <input wire:model="createForm.latitude" type="number" step="any" class="input-field" placeholder="24.7136" dir="ltr">
+                        @error('createForm.latitude') <span style="color:#dc2626;font-size:0.75rem;margin-top:3px;display:block;">{{ $message }}</span> @enderror
+                    </div>
+                    <div>
+                        <label style="display:block;color:#374151;font-size:0.82rem;font-weight:600;margin-bottom:5px;">خط الطول (Longitude)</label>
+                        <input wire:model="createForm.longitude" type="number" step="any" class="input-field" placeholder="46.6753" dir="ltr">
+                        @error('createForm.longitude') <span style="color:#dc2626;font-size:0.75rem;margin-top:3px;display:block;">{{ $message }}</span> @enderror
+                    </div>
+                    <div style="grid-column:1/-1;">
+                        <label style="display:block;color:#374151;font-size:0.82rem;font-weight:600;margin-bottom:5px;">هاتف المحطة</label>
+                        <input wire:model="createForm.station_phone" type="tel" class="input-field" placeholder="رقم هاتف المحطة" dir="ltr" autocomplete="off">
+                        @error('createForm.station_phone') <span style="color:#dc2626;font-size:0.75rem;margin-top:3px;display:block;">{{ $message }}</span> @enderror
+                    </div>
                 </div>
+                @endif
             </div>
+
+            {{-- Footer Buttons --}}
             <div style="padding:14px 24px;background:#faf5ff;border-top:1px solid #f1f5f9;display:flex;gap:10px;justify-content:flex-end;">
-                <button wire:click="closeModal" style="padding:9px 20px;color:#64748b;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.875rem;font-weight:600;cursor:pointer;background:white;font-family:'Tajawal',sans-serif;">إلغاء</button>
-                <button wire:click="createOwner" wire:loading.attr="disabled"
-                        style="padding:9px 24px;background:linear-gradient(135deg,#7c3aed,#6d28d9);color:white;border:none;border-radius:10px;font-size:0.875rem;font-weight:600;cursor:pointer;font-family:'Tajawal',sans-serif;">
-                    <span wire:loading.remove wire:target="createOwner">إنشاء الحساب</span>
-                    <span wire:loading wire:target="createOwner">جاري الإنشاء...</span>
-                </button>
+                @if($createStep === 1)
+                    <button wire:click="closeModal" style="padding:9px 20px;color:#64748b;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.875rem;font-weight:600;cursor:pointer;background:white;font-family:'Tajawal',sans-serif;">إلغاء</button>
+                    <button wire:click="nextStep" wire:loading.attr="disabled"
+                            style="padding:9px 24px;background:linear-gradient(135deg,#7c3aed,#6d28d9);color:white;border:none;border-radius:10px;font-size:0.875rem;font-weight:600;cursor:pointer;font-family:'Tajawal',sans-serif;display:flex;align-items:center;gap:8px;">
+                        <span wire:loading.remove wire:target="nextStep">التالي</span>
+                        <span wire:loading wire:target="nextStep">جاري التحقق...</span>
+                        <svg wire:loading.remove wire:target="nextStep" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                    </button>
+                @else
+                    <button wire:click="$set('createStep', 1)" style="padding:9px 20px;color:#64748b;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.875rem;font-weight:600;cursor:pointer;background:white;font-family:'Tajawal',sans-serif;display:flex;align-items:center;gap:8px;">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                        رجوع
+                    </button>
+                    <button wire:click="createOwner" wire:loading.attr="disabled"
+                            style="padding:9px 24px;background:linear-gradient(135deg,#7c3aed,#6d28d9);color:white;border:none;border-radius:10px;font-size:0.875rem;font-weight:600;cursor:pointer;font-family:'Tajawal',sans-serif;">
+                        <span wire:loading.remove wire:target="createOwner">إنشاء الحساب</span>
+                        <span wire:loading wire:target="createOwner">جاري الإنشاء...</span>
+                    </button>
+                @endif
             </div>
         </div>
     </div>

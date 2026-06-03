@@ -19,7 +19,7 @@ class OwnerController extends Controller
 {
     private function ensureOwner(Request $request): void
     {
-        abort_unless(in_array($request->user()->user_role, ['station_owner', 'car_wash_owner', 'maintenance_owner', 'admin'], true), 403, 'Requires Owner role');
+        abort_unless(in_array($request->user()->user_role, ['station_owner', 'admin'], true), 403, 'Requires station_owner role');
     }
 
     public function myStations(Request $request): JsonResponse
@@ -30,14 +30,14 @@ class OwnerController extends Controller
 
     public function myCarWashes(Request $request): JsonResponse
     {
-        abort_unless($request->user()->user_role === 'car_wash_owner' || $request->user()->user_role === 'admin', 403, 'Car wash owner only');
-        return response()->json(CarWashCenter::query()->where('owner_id', $request->user()->id)->get());
+        // Car wash functionality reserved for future use
+        return response()->json([]);
     }
 
     public function myMaintenanceCenters(Request $request): JsonResponse
     {
-        abort_unless($request->user()->user_role === 'maintenance_owner' || $request->user()->user_role === 'admin', 403, 'Maintenance owner only');
-        return response()->json(MaintenanceCenter::query()->where('owner_id', $request->user()->id)->get());
+        // Maintenance center functionality reserved for future use
+        return response()->json([]);
     }
 
     public function myBusiness(Request $request): JsonResponse
@@ -237,5 +237,76 @@ class OwnerController extends Controller
             'total_services' => MaintenanceService::query()->where('center_id', $centerId)->where('service_date', '>=', now()->startOfDay())->count(),
             'total_cost' => (float) MaintenanceService::query()->where('center_id', $centerId)->where('service_date', '>=', now()->startOfDay())->sum('cost'),
         ]);
+    }
+
+    public function toggleStationOpen(Request $request, int $id): JsonResponse
+    {
+        $this->ensureOwner($request);
+        $station = GasStation::where('id', $id)->where('owner_id', $request->user()->id)->firstOrFail();
+        $station->update(['is_open' => !$station->is_open]);
+        return response()->json(['is_open' => $station->is_open]);
+    }
+
+    public function employeesList(Request $request): JsonResponse
+    {
+        $this->ensureOwner($request);
+        $stationIds = GasStation::where('owner_id', $request->user()->id)->pluck('id');
+        $employees = Employee::with(['user:id,full_name,phone', 'station:id,station_name'])
+            ->whereIn('station_id', $stationIds)->get();
+        return response()->json($employees);
+    }
+
+    public function addEmployeeByPhone(Request $request): JsonResponse
+    {
+        $this->ensureOwner($request);
+        $data = $request->validate([
+            'phone'      => 'required|string',
+            'station_id' => 'required|integer',
+            'position'   => 'required|string|max:50',
+            'salary'     => 'nullable|numeric',
+            'hire_date'  => 'required|date',
+        ]);
+        // verify station belongs to owner
+        $station = GasStation::where('id', $data['station_id'])->where('owner_id', $request->user()->id)->firstOrFail();
+        $user = User::where('phone', $data['phone'])->firstOrFail();
+        $employee = Employee::create([
+            'user_id'       => $user->id,
+            'station_id'    => $data['station_id'],
+            'employee_code' => 'EMP-' . strtoupper(Str::random(8)),
+            'position'      => $data['position'],
+            'salary'        => $data['salary'],
+            'hire_date'     => $data['hire_date'],
+            'is_active'     => true,
+        ]);
+        $user->update(['user_role' => 'station_worker']);
+        return response()->json($employee->load('user', 'station'), 201);
+    }
+
+    public function myRefuels(Request $request): JsonResponse
+    {
+        $this->ensureOwner($request);
+        $stationIds = GasStation::where('owner_id', $request->user()->id)->pluck('id');
+        $refuels = Refuel::with(['user:id,full_name,phone', 'station:id,station_name'])
+            ->whereIn('station_id', $stationIds)
+            ->latest('refuel_date')->paginate(20);
+        return response()->json($refuels);
+    }
+
+    public function monthlyReport(Request $request): JsonResponse
+    {
+        $this->ensureOwner($request);
+        $stationIds = GasStation::where('owner_id', $request->user()->id)->pluck('id');
+        $months = collect(range(5, 0))->map(function ($i) use ($stationIds) {
+            $start = now()->subMonths($i)->startOfMonth();
+            $end   = now()->subMonths($i)->endOfMonth();
+            return [
+                'month'   => $start->format('Y-m'),
+                'label'   => $start->locale('ar')->isoFormat('MMM YYYY'),
+                'revenue' => (float) Refuel::whereIn('station_id', $stationIds)->whereBetween('refuel_date', [$start, $end])->sum('final_price'),
+                'refuels' => Refuel::whereIn('station_id', $stationIds)->whereBetween('refuel_date', [$start, $end])->count(),
+                'liters'  => (float) Refuel::whereIn('station_id', $stationIds)->whereBetween('refuel_date', [$start, $end])->sum('liters'),
+            ];
+        });
+        return response()->json($months);
     }
 }

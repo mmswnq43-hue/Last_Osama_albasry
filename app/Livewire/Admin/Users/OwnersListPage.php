@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Admin\Users;
 
+use App\Models\GasStation;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Livewire\Attributes\Layout;
@@ -20,17 +21,138 @@ class OwnersListPage extends Component
     public ?array $selectedOwner = null;
     public string $showModal = '';
     public string $successMessage = '';
+    public int $createStep = 1;
 
     public array $createForm = [
-        'full_name' => '',
-        'phone'     => '',
-        'email'     => '',
-        'password'  => '',
+        // Owner fields
+        'full_name'           => '',
+        'phone'               => '',
+        'email'               => '',
+        'national_id'         => '',
+        'address'             => '',
+        'password'            => '',
+        // Station fields
+        'station_name'        => '',
+        'city'                => '',
+        'district'            => '',
+        'license_number'      => '',
+        'license_issue_date'  => '',
+        'license_expiry_date' => '',
+        'pumps_count'         => 1,
+        'fuel_types'          => [],
+        'latitude'            => '',
+        'longitude'           => '',
+        'station_phone'       => '',
     ];
+
     public string $createError = '';
 
     public function updatedSearch(): void { $this->resetPage(); }
     public function updatedStatusFilter(): void { $this->resetPage(); }
+
+    public function openCreate(): void
+    {
+        $this->createForm = [
+            'full_name'           => '',
+            'phone'               => '',
+            'email'               => '',
+            'national_id'         => '',
+            'address'             => '',
+            'password'            => '',
+            'station_name'        => '',
+            'city'                => '',
+            'district'            => '',
+            'license_number'      => '',
+            'license_issue_date'  => '',
+            'license_expiry_date' => '',
+            'pumps_count'         => 1,
+            'fuel_types'          => [],
+            'latitude'            => '',
+            'longitude'           => '',
+            'station_phone'       => '',
+        ];
+        $this->createError = '';
+        $this->createStep = 1;
+        $this->showModal = 'create';
+    }
+
+    public function nextStep(): void
+    {
+        $this->createError = '';
+        $this->validate([
+            'createForm.full_name'   => 'required|string|max:100',
+            'createForm.phone'       => 'required|string|max:20|unique:users,phone',
+            'createForm.email'       => 'nullable|email|max:150|unique:users,email',
+            'createForm.national_id' => 'nullable|string|max:50',
+            'createForm.address'     => 'nullable|string',
+            'createForm.password'    => 'required|string|min:6',
+        ]);
+        $this->createStep = 2;
+    }
+
+    public function createOwner(): void
+    {
+        $this->createError = '';
+        $this->validate([
+            'createForm.station_name'        => 'required|string|max:100',
+            'createForm.city'                => 'required|string|max:100',
+            'createForm.district'            => 'nullable|string|max:100',
+            'createForm.license_number'      => 'nullable|string|max:100',
+            'createForm.license_issue_date'  => 'nullable|date',
+            'createForm.license_expiry_date' => 'nullable|date|after_or_equal:createForm.license_issue_date',
+            'createForm.pumps_count'         => 'required|integer|min:1|max:100',
+            'createForm.fuel_types'          => 'nullable|array',
+            'createForm.latitude'            => 'nullable|numeric|between:-90,90',
+            'createForm.longitude'           => 'nullable|numeric|between:-180,180',
+            'createForm.station_phone'       => 'nullable|string|max:20',
+        ]);
+
+        $user = User::create([
+            'full_name'       => $this->createForm['full_name'],
+            'phone'           => $this->createForm['phone'],
+            'email'           => $this->createForm['email'] ?: null,
+            'national_id'     => $this->createForm['national_id'] ?: null,
+            'address'         => $this->createForm['address'] ?: null,
+            'user_role'       => 'station_owner',
+            'password_hash'   => Hash::make($this->createForm['password']),
+            'is_active'       => true,
+            'approval_status' => 'approved',
+            'created_at'      => now(),
+        ]);
+
+        $stationCode = 'ST' . str_pad($user->id, 6, '0', STR_PAD_LEFT);
+
+        GasStation::create([
+            'owner_id'            => $user->id,
+            'station_name'        => $this->createForm['station_name'],
+            'city'                => $this->createForm['city'],
+            'district'            => $this->createForm['district'] ?: null,
+            'license_number'      => $this->createForm['license_number'] ?: null,
+            'license_issue_date'  => $this->createForm['license_issue_date'] ?: null,
+            'license_expiry_date' => $this->createForm['license_expiry_date'] ?: null,
+            'pumps_count'         => $this->createForm['pumps_count'],
+            'fuel_types'          => $this->createForm['fuel_types'] ?: null,
+            'latitude'            => $this->createForm['latitude'] !== '' ? $this->createForm['latitude'] : null,
+            'longitude'           => $this->createForm['longitude'] !== '' ? $this->createForm['longitude'] : null,
+            'phone'               => $this->createForm['station_phone'] ?: null,
+            'station_code'        => $stationCode,
+            'is_active'           => true,
+            'is_open'             => false,
+            'rating'              => 0,
+            'rating_count'        => 0,
+            'created_at'          => now(),
+        ]);
+
+        $this->successMessage = 'تم إنشاء حساب المالك والمحطة بنجاح';
+        $this->closeModal();
+    }
+
+    public function closeModal(): void
+    {
+        $this->showModal = '';
+        $this->selectedOwner = null;
+        $this->createStep = 1;
+    }
 
     public function openOwnerDetails(int $userId): void
     {
@@ -54,44 +176,6 @@ class OwnersListPage extends Component
         $user = User::findOrFail($userId);
         $user->forceFill(['is_active' => ! $user->is_active])->save();
         $this->successMessage = $user->is_active ? 'تم تفعيل المالك' : 'تم تعطيل المالك';
-    }
-
-    public function openCreate(): void
-    {
-        $this->createForm = ['full_name' => '', 'phone' => '', 'email' => '', 'password' => ''];
-        $this->createError = '';
-        $this->showModal = 'create';
-    }
-
-    public function createOwner(): void
-    {
-        $this->createError = '';
-        $this->validate([
-            'createForm.full_name' => 'required|string|max:100',
-            'createForm.phone'     => 'required|string|max:20|unique:users,phone',
-            'createForm.email'     => 'nullable|email|max:150|unique:users,email',
-            'createForm.password'  => 'required|string|min:6',
-        ]);
-
-        User::create([
-            'full_name'       => $this->createForm['full_name'],
-            'phone'           => $this->createForm['phone'],
-            'email'           => $this->createForm['email'] ?: null,
-            'user_role'       => 'station_owner',
-            'password_hash'   => Hash::make($this->createForm['password']),
-            'is_active'       => true,
-            'approval_status' => 'approved',
-            'created_at'      => now(),
-        ]);
-
-        $this->successMessage = 'تم إنشاء حساب المالك بنجاح';
-        $this->closeModal();
-    }
-
-    public function closeModal(): void
-    {
-        $this->showModal = '';
-        $this->selectedOwner = null;
     }
 
     public function render()

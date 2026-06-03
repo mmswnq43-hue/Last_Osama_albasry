@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ $title ?? 'لوحة تحكم غازي' }}</title>
+    <title>{{ $title ?? 'لوحة مالك المحطة - غازي' }}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -114,82 +114,6 @@
             .stat-card { padding: 16px; border-radius: 14px; }
             .glass-card { border-radius: 14px; }
         }
-
-        /* ── Responsive Grid Helpers ──────────────────── */
-        .admin-stats-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 16px;
-            margin-bottom: 22px;
-        }
-        .admin-two-col {
-            display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 18px;
-            margin-bottom: 22px;
-        }
-        .admin-filter-bar {
-            background: white;
-            border-radius: 14px;
-            padding: 14px 18px;
-            margin-bottom: 16px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            align-items: center;
-            box-shadow: 0 1px 8px rgba(0,0,0,0.05);
-            border: 1px solid #f1f5f9;
-        }
-        .admin-page-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-        .admin-card-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 16px;
-        }
-        /* Pending approval card vehicle grid */
-        .vehicle-info-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-        .pending-card-body {
-            display: grid;
-            grid-template-columns: 1fr auto;
-            gap: 20px;
-            padding: 18px 20px;
-        }
-        .pending-sub-panel { width: 260px; flex-shrink: 0; }
-
-        @media (max-width: 1024px) {
-            .admin-stats-grid { grid-template-columns: repeat(2, 1fr); }
-            .admin-card-grid { grid-template-columns: repeat(2, 1fr); }
-        }
-        @media (max-width: 768px) {
-            .admin-stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 14px; }
-            .admin-two-col { grid-template-columns: 1fr; gap: 14px; }
-            .admin-card-grid { grid-template-columns: 1fr; }
-            .admin-filter-bar { padding: 12px 14px; gap: 8px; }
-            .admin-page-header { margin-bottom: 14px; }
-            .vehicle-info-grid { grid-template-columns: 1fr; gap: 8px; }
-            .pending-card-body { grid-template-columns: 1fr; gap: 12px; }
-            .pending-sub-panel { width: 100%; }
-            /* Table: hide less important columns on mobile */
-            .table-hide-mobile { display: none !important; }
-            /* Stack action buttons */
-            .action-btns { flex-direction: column !important; }
-        }
-        @media (max-width: 480px) {
-            .admin-stats-grid { grid-template-columns: 1fr; }
-            .stat-card { padding: 14px; }
-            .admin-content { padding: 10px; }
-        }
     </style>
 </head>
 <body>
@@ -219,20 +143,20 @@
                 </div>
                 <div>
                     <p style="color:white; font-weight:800; font-size:1.1rem; line-height:1.2; margin:0;">غـازي</p>
-                    <p style="color:#64748b; font-size:0.72rem; font-weight:500; margin:0;">لوحة الإدارة</p>
+                    <p style="color:#64748b; font-size:0.72rem; font-weight:500; margin:0;">لوحة مالك المحطة</p>
                 </div>
             </div>
         </div>
 
-        {{-- Admin Profile --}}
+        {{-- Owner Profile --}}
         <div style="padding: 14px 20px; border-bottom: 1px solid rgba(255,255,255,0.07);">
             <div style="display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.05); padding:10px 12px; border-radius:12px;">
                 <div style="width:36px; height:36px; background: linear-gradient(135deg, #f97316, #3b82f6); border-radius:10px; display:flex; align-items:center; justify-content:center; color:white; font-weight:800; font-size:0.9rem; flex-shrink:0;">
-                    {{ mb_substr(auth()->user()->full_name ?? 'A', 0, 1) }}
+                    {{ mb_substr(auth()->user()->full_name ?? 'O', 0, 1) }}
                 </div>
                 <div style="flex:1; min-width:0;">
-                    <p style="color:white; font-size:0.82rem; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin:0;">{{ auth()->user()->full_name ?? 'Admin' }}</p>
-                    <p style="color:#f97316; font-size:0.68rem; font-weight:500; margin:0;">مدير النظام</p>
+                    <p style="color:white; font-size:0.82rem; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin:0;">{{ auth()->user()->full_name ?? 'مالك المحطة' }}</p>
+                    <p style="color:#f97316; font-size:0.68rem; font-weight:500; margin:0;">مالك المحطة</p>
                 </div>
                 <div style="width:8px; height:8px; background:#22c55e; border-radius:999px; border:2px solid #0f172a;"></div>
             </div>
@@ -240,72 +164,31 @@
 
         {{-- Navigation --}}
         <nav style="flex:1; min-height:0; overflow-y:auto; padding: 12px 12px; scrollbar-width:thin; scrollbar-color:#334155 transparent;">
-            <p class="nav-section">الرئيسية</p>
-            <a href="{{ route('admin.dashboard') }}" class="nav-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" @click="sidebarOpen = false">
+            <p class="nav-section">القائمة الرئيسية</p>
+
+            <a href="{{ route('owner.dashboard') }}" class="nav-item {{ request()->routeIs('owner.dashboard') ? 'active' : '' }}" @click="sidebarOpen = false">
                 <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zm10 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zm10 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"/></svg>
                 لوحة التحكم
             </a>
 
-            <p class="nav-section">المستخدمون</p>
-            <a href="{{ route('admin.users.pending') }}" class="nav-item {{ request()->routeIs('admin.users.pending') ? 'active' : '' }}" @click="sidebarOpen = false">
-                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                طلبات الانضمام
-                @php $pendingCount = \App\Models\User::where('approval_status','pending')->count(); @endphp
-                @if($pendingCount > 0)
-                <span style="margin-right:auto; background:#f97316; color:white; font-size:0.68rem; font-weight:700; padding:2px 8px; border-radius:999px; box-shadow:0 2px 6px rgba(249,115,22,0.4);">{{ $pendingCount }}</span>
-                @endif
+            <a href="{{ route('owner.stations') }}" class="nav-item {{ request()->routeIs('owner.stations') ? 'active' : '' }}" @click="sidebarOpen = false">
+                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                محطاتي
             </a>
-            <a href="{{ route('admin.users.index') }}" class="nav-item {{ request()->routeIs('admin.users.index') ? 'active' : '' }}" @click="sidebarOpen = false">
+
+            <a href="{{ route('owner.employees') }}" class="nav-item {{ request()->routeIs('owner.employees') ? 'active' : '' }}" @click="sidebarOpen = false">
                 <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0"/></svg>
-                إدارة العملاء
-            </a>
-            <a href="{{ route('admin.owners.index') }}" class="nav-item {{ request()->routeIs('admin.owners.index') ? 'active' : '' }}" @click="sidebarOpen = false">
-                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
-                إدارة الملاك
-            </a>
-            <a href="{{ route('admin.subscriptions.index') }}" class="nav-item {{ request()->routeIs('admin.subscriptions.index') ? 'active' : '' }}" @click="sidebarOpen = false">
-                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-                الاشتراكات
-            </a>
-            <a href="{{ route('admin.bankaccounts.index') }}" class="nav-item {{ request()->routeIs('admin.bankaccounts.index') ? 'active' : '' }}" @click="sidebarOpen = false">
-                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 10l9-6 9 6M4 10v10h16V10M9 21v-6h6v6"/></svg>
-                الحسابات البنكية
-            </a>
-            <a href="{{ route('admin.ads.index') }}" class="nav-item {{ request()->routeIs('admin.ads.*') ? 'active' : '' }}" @click="sidebarOpen = false">
-                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/></svg>
-                الإعلانات
+                الموظفين
             </a>
 
-            <p class="nav-section">الأعمال</p>
-            <a href="{{ route('admin.stations.index') }}" class="nav-item {{ request()->routeIs('admin.stations.index') ? 'active' : '' }}" @click="sidebarOpen = false">
-                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                محطات الوقود
-            </a>
-            <a href="{{ route('admin.carwashes.index') }}" class="nav-item {{ request()->routeIs('admin.carwashes.index') ? 'active' : '' }}" @click="sidebarOpen = false">
-                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
-                مغاسل السيارات
-            </a>
-            <a href="{{ route('admin.maintenance.index') }}" class="nav-item {{ request()->routeIs('admin.maintenance.index') ? 'active' : '' }}" @click="sidebarOpen = false">
-                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                مراكز الصيانة
+            <a href="{{ route('owner.refuels') }}" class="nav-item {{ request()->routeIs('owner.refuels') ? 'active' : '' }}" @click="sidebarOpen = false">
+                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+                التعبئات
             </a>
 
-            <p class="nav-section">النظام</p>
-            <a href="{{ route('admin.security.logs') }}" class="nav-item {{ request()->routeIs('admin.security.logs') ? 'active' : '' }}" @click="sidebarOpen = false">
-                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-                سجلات الأمان
-            </a>
-            <a href="{{ route('admin.tickets.index') }}" class="nav-item {{ request()->routeIs('admin.tickets.index') ? 'active' : '' }}" @click="sidebarOpen = false">
-                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/></svg>
-                تذاكر الدعم
-            </a>
-            <a href="{{ route('admin.notifications.index') }}" class="nav-item {{ request()->routeIs('admin.notifications.index') ? 'active' : '' }}" @click="sidebarOpen = false">
-                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
-                الإشعارات
-            </a>
-            <a href="{{ route('admin.settings.index') }}" class="nav-item {{ request()->routeIs('admin.settings.index') ? 'active' : '' }}" @click="sidebarOpen = false">
-                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
-                إعدادات النظام
+            <a href="{{ route('owner.reports') }}" class="nav-item {{ request()->routeIs('owner.reports') ? 'active' : '' }}" @click="sidebarOpen = false">
+                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                التقارير
             </a>
         </nav>
 
@@ -335,7 +218,7 @@
                     <span>غازي</span>
                     <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
                 </div>
-                <h1 style="font-size:1rem; font-weight:700; color:#0f172a; margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ $title ?? 'لوحة التحكم' }}</h1>
+                <h1 style="font-size:1rem; font-weight:700; color:#0f172a; margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ $title ?? 'لوحة مالك المحطة' }}</h1>
             </div>
             <div style="display:flex; align-items:center; gap:14px; flex-shrink:0;">
                 <div style="display:flex; align-items:center; gap:6px; background:#f0f4ff; border-radius:8px; padding:6px 12px;">
