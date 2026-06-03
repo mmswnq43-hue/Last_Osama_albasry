@@ -146,6 +146,12 @@ Route::prefix('owner')->middleware('auth:sanctum')->group(function (): void {
     Route::get('/stations/{stationId}/today-refuels', [OwnerController::class, 'stationTodayRefuels']);
     Route::get('/car-washes/{centerId}/today-washes', [OwnerController::class, 'washCenterToday']);
     Route::get('/maintenance/{centerId}/today-services', [OwnerController::class, 'maintenanceToday']);
+    // New endpoints
+    Route::get('/employees', [OwnerController::class, 'employeesList']);
+    Route::post('/employees/add-by-phone', [OwnerController::class, 'addEmployeeByPhone']);
+    Route::patch('/stations/{id}/toggle-open', [OwnerController::class, 'toggleStationOpen']);
+    Route::get('/refuels', [OwnerController::class, 'myRefuels']);
+    Route::get('/reports/monthly', [OwnerController::class, 'monthlyReport']);
 });
 
 Route::prefix('admin')->middleware('auth:sanctum')->group(function (): void {
