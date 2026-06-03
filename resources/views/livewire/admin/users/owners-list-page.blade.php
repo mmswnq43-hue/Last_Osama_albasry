@@ -248,19 +248,19 @@
             {{-- Footer Buttons --}}
             <div style="padding:14px 24px;background:#faf5ff;border-top:1px solid #f1f5f9;display:flex;gap:10px;justify-content:flex-end;">
                 @if($createStep === 1)
-                    <button wire:click="closeModal" style="padding:9px 20px;color:#64748b;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.875rem;font-weight:600;cursor:pointer;background:white;font-family:'Tajawal',sans-serif;">إلغاء</button>
-                    <button wire:click="nextStep" wire:loading.attr="disabled"
+                    <button type="button" wire:click="closeModal" style="padding:9px 20px;color:#64748b;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.875rem;font-weight:600;cursor:pointer;background:white;font-family:'Tajawal',sans-serif;">إلغاء</button>
+                    <button type="button" wire:click="nextStep" wire:loading.attr="disabled"
                             style="padding:9px 24px;background:linear-gradient(135deg,#7c3aed,#6d28d9);color:white;border:none;border-radius:10px;font-size:0.875rem;font-weight:600;cursor:pointer;font-family:'Tajawal',sans-serif;display:flex;align-items:center;gap:8px;">
                         <span wire:loading.remove wire:target="nextStep">التالي</span>
                         <span wire:loading wire:target="nextStep">جاري التحقق...</span>
                         <svg wire:loading.remove wire:target="nextStep" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
                     </button>
                 @else
-                    <button wire:click="$set('createStep', 1)" style="padding:9px 20px;color:#64748b;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.875rem;font-weight:600;cursor:pointer;background:white;font-family:'Tajawal',sans-serif;display:flex;align-items:center;gap:8px;">
+                    <button type="button" wire:click="$set('createStep', 1)" style="padding:9px 20px;color:#64748b;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.875rem;font-weight:600;cursor:pointer;background:white;font-family:'Tajawal',sans-serif;display:flex;align-items:center;gap:8px;">
                         <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                         رجوع
                     </button>
-                    <button wire:click="createOwner" wire:loading.attr="disabled"
+                    <button type="button" wire:click="createOwner" wire:loading.attr="disabled"
                             style="padding:9px 24px;background:linear-gradient(135deg,#7c3aed,#6d28d9);color:white;border:none;border-radius:10px;font-size:0.875rem;font-weight:600;cursor:pointer;font-family:'Tajawal',sans-serif;">
                         <span wire:loading.remove wire:target="createOwner">إنشاء الحساب</span>
                         <span wire:loading wire:target="createOwner">جاري الإنشاء...</span>

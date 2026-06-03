@@ -136,6 +136,7 @@ class OwnersListPage extends Component
             'owner_id'            => $user->id,
             'station_name'        => $this->createForm['station_name'],
             'commercial_register' => $this->createForm['license_number'] ?: null,
+            'location'            => trim($this->createForm['city'] . ($this->createForm['district'] ? '، ' . $this->createForm['district'] : '')),
             'city'                => $this->createForm['city'],
             'district'            => $this->createForm['district'] ?: null,
             'license_number'      => $this->createForm['license_number'] ?: null,
