@@ -83,6 +83,12 @@ class LoginPage extends Component
 
         RateLimiter::clear($key);
         Auth::login($user, $this->remember);
+
+        if ($user->user_role === 'station_owner' || $user->user_role === 'station_worker') {
+            $this->redirect(route('owner.dashboard'), navigate: true);
+            return;
+        }
+
         $this->redirect(route('customer.status'), navigate: true);
     }
 
