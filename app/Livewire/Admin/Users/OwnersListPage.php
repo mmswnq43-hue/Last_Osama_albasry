@@ -45,6 +45,16 @@ class OwnersListPage extends Component
         'station_phone'       => '',
     ];
 
+    public array $editForm = [
+        'full_name'   => '',
+        'phone'       => '',
+        'email'       => '',
+        'national_id' => '',
+        'address'     => '',
+    ];
+    public int $editOwnerId = 0;
+    public string $deleteConfirmId = '';
+
     public string $createError = '';
 
     public function updatedSearch(): void { $this->resetPage(); }
@@ -148,11 +158,63 @@ class OwnersListPage extends Component
         $this->closeModal();
     }
 
+    public function openEdit(int $userId): void
+    {
+        $user = User::findOrFail($userId);
+        $this->editOwnerId = $userId;
+        $this->editForm = [
+            'full_name'   => $user->full_name ?? '',
+            'phone'       => $user->phone ?? '',
+            'email'       => $user->email ?? '',
+            'national_id' => $user->national_id ?? '',
+            'address'     => $user->address ?? '',
+        ];
+        $this->showModal = 'edit';
+    }
+
+    public function updateOwner(): void
+    {
+        $this->validate([
+            'editForm.full_name'   => 'required|string|max:100',
+            'editForm.phone'       => 'required|string|max:20|unique:users,phone,' . $this->editOwnerId,
+            'editForm.email'       => 'nullable|email|max:150|unique:users,email,' . $this->editOwnerId,
+            'editForm.national_id' => 'nullable|string|max:50',
+            'editForm.address'     => 'nullable|string',
+        ]);
+
+        User::findOrFail($this->editOwnerId)->forceFill([
+            'full_name'   => $this->editForm['full_name'],
+            'phone'       => $this->editForm['phone'],
+            'email'       => $this->editForm['email'] ?: null,
+            'national_id' => $this->editForm['national_id'] ?: null,
+            'address'     => $this->editForm['address'] ?: null,
+        ])->save();
+
+        $this->successMessage = 'تم تحديث بيانات المالك بنجاح';
+        $this->closeModal();
+    }
+
+    public function confirmDelete(int $userId): void
+    {
+        $this->deleteConfirmId = (string) $userId;
+        $this->showModal = 'delete';
+    }
+
+    public function deleteOwner(): void
+    {
+        if (! $this->deleteConfirmId) return;
+        User::findOrFail((int) $this->deleteConfirmId)->delete();
+        $this->successMessage = 'تم حذف المالك بنجاح';
+        $this->closeModal();
+    }
+
     public function closeModal(): void
     {
         $this->showModal = '';
         $this->selectedOwner = null;
         $this->createStep = 1;
+        $this->editOwnerId = 0;
+        $this->deleteConfirmId = '';
     }
 
     public function openOwnerDetails(int $userId): void

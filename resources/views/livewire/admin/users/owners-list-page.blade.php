@@ -79,6 +79,14 @@
                                     style="padding:5px 12px;background:{{ $owner->is_active ? '#fff5f5' : '#f0fdf4' }};color:{{ $owner->is_active ? '#dc2626' : '#16a34a' }};border:none;border-radius:7px;font-size:0.75rem;font-weight:600;cursor:pointer;">
                                     {{ $owner->is_active ? 'إيقاف' : 'تفعيل' }}
                                 </button>
+                                <button wire:click="openEdit({{ $owner->id }})"
+                                    style="padding:5px 12px;background:#fef9c3;color:#a16207;border:none;border-radius:7px;font-size:0.75rem;font-weight:600;cursor:pointer;">
+                                    تعديل
+                                </button>
+                                <button wire:click="confirmDelete({{ $owner->id }})"
+                                    style="padding:5px 12px;background:#fff5f5;color:#dc2626;border:none;border-radius:7px;font-size:0.75rem;font-weight:600;cursor:pointer;">
+                                    حذف
+                                </button>
                             </div>
                         </td>
                     </tr>
@@ -302,6 +310,81 @@
                 </div>
                 @endif
                 <p style="font-size:0.75rem;color:#94a3b8;">تاريخ التسجيل: {{ $selectedOwner['created_at'] }}</p>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    {{-- Edit Owner Modal --}}
+    @if($showModal === 'edit')
+    <div class="modal-overlay">
+        <div class="modal-box" style="max-width:500px;">
+            <div style="background:linear-gradient(135deg,#f59e0b,#d97706);padding:20px 24px;display:flex;align-items:center;justify-content:space-between;">
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <div style="width:40px;height:40px;background:rgba(255,255,255,0.2);border-radius:12px;display:flex;align-items:center;justify-content:center;">
+                        <svg width="20" height="20" fill="none" stroke="white" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                    </div>
+                    <h3 style="font-weight:700;color:white;font-size:1rem;">تعديل بيانات المالك</h3>
+                </div>
+                <button wire:click="closeModal" style="background:rgba(255,255,255,0.2);border:none;border-radius:8px;padding:6px;cursor:pointer;color:white;display:flex;">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div style="padding:22px 24px;display:flex;flex-direction:column;gap:14px;">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                    <div style="grid-column:1/-1;">
+                        <label style="display:block;color:#374151;font-size:0.82rem;font-weight:600;margin-bottom:5px;">الاسم الكامل <span style="color:#dc2626;">*</span></label>
+                        <input wire:model="editForm.full_name" type="text" class="input-field" autocomplete="off">
+                        @error('editForm.full_name') <span style="color:#dc2626;font-size:0.75rem;margin-top:3px;display:block;">{{ $message }}</span> @enderror
+                    </div>
+                    <div>
+                        <label style="display:block;color:#374151;font-size:0.82rem;font-weight:600;margin-bottom:5px;">رقم الجوال <span style="color:#dc2626;">*</span></label>
+                        <input wire:model="editForm.phone" type="tel" class="input-field" dir="ltr" autocomplete="off">
+                        @error('editForm.phone') <span style="color:#dc2626;font-size:0.75rem;margin-top:3px;display:block;">{{ $message }}</span> @enderror
+                    </div>
+                    <div>
+                        <label style="display:block;color:#374151;font-size:0.82rem;font-weight:600;margin-bottom:5px;">البريد الإلكتروني</label>
+                        <input wire:model="editForm.email" type="email" class="input-field" dir="ltr" autocomplete="off">
+                        @error('editForm.email') <span style="color:#dc2626;font-size:0.75rem;margin-top:3px;display:block;">{{ $message }}</span> @enderror
+                    </div>
+                    <div>
+                        <label style="display:block;color:#374151;font-size:0.82rem;font-weight:600;margin-bottom:5px;">رقم الهوية / السجل التجاري</label>
+                        <input wire:model="editForm.national_id" type="text" class="input-field" dir="ltr" autocomplete="off">
+                    </div>
+                    <div style="grid-column:1/-1;">
+                        <label style="display:block;color:#374151;font-size:0.82rem;font-weight:600;margin-bottom:5px;">العنوان</label>
+                        <input wire:model="editForm.address" type="text" class="input-field" autocomplete="off">
+                    </div>
+                </div>
+            </div>
+            <div style="padding:14px 24px;background:#fffbeb;border-top:1px solid #f1f5f9;display:flex;gap:10px;justify-content:flex-end;">
+                <button wire:click="closeModal" style="padding:9px 20px;color:#64748b;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.875rem;font-weight:600;cursor:pointer;background:white;font-family:'Tajawal',sans-serif;">إلغاء</button>
+                <button wire:click="updateOwner" wire:loading.attr="disabled" style="padding:9px 24px;background:linear-gradient(135deg,#f59e0b,#d97706);color:white;border:none;border-radius:10px;font-size:0.875rem;font-weight:600;cursor:pointer;font-family:'Tajawal',sans-serif;">
+                    <span wire:loading.remove wire:target="updateOwner">حفظ التعديلات</span>
+                    <span wire:loading wire:target="updateOwner">جاري الحفظ...</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    {{-- Delete Confirmation Modal --}}
+    @if($showModal === 'delete')
+    <div class="modal-overlay">
+        <div class="modal-box" style="max-width:420px;">
+            <div style="padding:32px 24px;text-align:center;">
+                <div style="width:60px;height:60px;background:#fef2f2;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+                    <svg width="28" height="28" fill="none" stroke="#dc2626" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                </div>
+                <h3 style="font-size:1.1rem;font-weight:800;color:#0f172a;margin-bottom:8px;">تأكيد الحذف</h3>
+                <p style="color:#64748b;font-size:0.875rem;margin-bottom:24px;">هل أنت متأكد من حذف هذا المالك؟ سيتم حذف جميع بياناته ومحطاته المرتبطة.</p>
+                <div style="display:flex;gap:10px;justify-content:center;">
+                    <button wire:click="closeModal" style="padding:10px 24px;color:#64748b;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.875rem;font-weight:600;cursor:pointer;background:white;font-family:'Tajawal',sans-serif;">إلغاء</button>
+                    <button wire:click="deleteOwner" wire:loading.attr="disabled" style="padding:10px 24px;background:linear-gradient(135deg,#ef4444,#dc2626);color:white;border:none;border-radius:10px;font-size:0.875rem;font-weight:600;cursor:pointer;font-family:'Tajawal',sans-serif;">
+                        <span wire:loading.remove wire:target="deleteOwner">نعم، احذف</span>
+                        <span wire:loading wire:target="deleteOwner">جاري الحذف...</span>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
