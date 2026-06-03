@@ -114,6 +114,82 @@
             .stat-card { padding: 16px; border-radius: 14px; }
             .glass-card { border-radius: 14px; }
         }
+
+        /* ── Responsive Grid Helpers ──────────────────── */
+        .admin-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 22px;
+        }
+        .admin-two-col {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 18px;
+            margin-bottom: 22px;
+        }
+        .admin-filter-bar {
+            background: white;
+            border-radius: 14px;
+            padding: 14px 18px;
+            margin-bottom: 16px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            box-shadow: 0 1px 8px rgba(0,0,0,0.05);
+            border: 1px solid #f1f5f9;
+        }
+        .admin-page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .admin-card-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+        /* Pending approval card vehicle grid */
+        .vehicle-info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .pending-card-body {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 20px;
+            padding: 18px 20px;
+        }
+        .pending-sub-panel { width: 260px; flex-shrink: 0; }
+
+        @media (max-width: 1024px) {
+            .admin-stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .admin-card-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 768px) {
+            .admin-stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 14px; }
+            .admin-two-col { grid-template-columns: 1fr; gap: 14px; }
+            .admin-card-grid { grid-template-columns: 1fr; }
+            .admin-filter-bar { padding: 12px 14px; gap: 8px; }
+            .admin-page-header { margin-bottom: 14px; }
+            .vehicle-info-grid { grid-template-columns: 1fr; gap: 8px; }
+            .pending-card-body { grid-template-columns: 1fr; gap: 12px; }
+            .pending-sub-panel { width: 100%; }
+            /* Table: hide less important columns on mobile */
+            .table-hide-mobile { display: none !important; }
+            /* Stack action buttons */
+            .action-btns { flex-direction: column !important; }
+        }
+        @media (max-width: 480px) {
+            .admin-stats-grid { grid-template-columns: 1fr; }
+            .stat-card { padding: 14px; }
+            .admin-content { padding: 10px; }
+        }
     </style>
 </head>
 <body>

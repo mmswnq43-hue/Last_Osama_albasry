@@ -16,7 +16,7 @@
     @endif
 
     {{-- Hero Stats --}}
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:22px;">
+    <div class="admin-stats-grid">
 
         {{-- Users --}}
         <div style="background:linear-gradient(135deg,#1e3a8a,#3b82f6);border-radius:18px;padding:22px;color:white;position:relative;overflow:hidden;box-shadow:0 8px 24px rgba(59,130,246,0.3);">
@@ -73,7 +73,7 @@
     </div>
 
     {{-- Business Summary + Recent Refuels --}}
-    <div style="display:grid;grid-template-columns:1fr 2fr;gap:18px;margin-bottom:22px;">
+    <div class="admin-two-col">
 
         {{-- Business Summary --}}
         <div>

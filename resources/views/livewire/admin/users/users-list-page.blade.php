@@ -6,8 +6,21 @@
     </div>
     @endif
 
+    {{-- Page Header --}}
+    <div class="admin-page-header">
+        <div>
+            <h2 style="font-size:1.05rem;font-weight:800;color:#0f172a;margin:0;">إدارة المستخدمين</h2>
+            <p style="color:#94a3b8;font-size:0.78rem;margin:4px 0 0;">إجمالي المستخدمين المسجلين في المنصة</p>
+        </div>
+        <button wire:click="openCreate"
+                style="display:flex;align-items:center;gap:8px;padding:10px 20px;background:linear-gradient(135deg,#f97316,#ea580c);color:white;border:none;border-radius:10px;font-size:0.875rem;font-weight:600;cursor:pointer;box-shadow:0 4px 12px rgba(249,115,22,0.3);font-family:'Tajawal',sans-serif;white-space:nowrap;">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            إضافة مستخدم
+        </button>
+    </div>
+
     {{-- Filters --}}
-    <div style="background:white;border-radius:14px;padding:14px 18px;margin-bottom:16px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;box-shadow:0 1px 8px rgba(0,0,0,0.05);border:1px solid #f1f5f9;">
+    <div class="admin-filter-bar">
         <input wire:model.live.debounce.300ms="search" type="text" placeholder="🔍 بحث بالاسم أو رقم الهاتف..." class="input-field" style="flex:1;min-width:200px;">
         <select wire:model.live="roleFilter" class="input-field">
             <option value="">كل الأدوار</option>
@@ -94,6 +107,75 @@
         </div>
         <div style="padding:12px 16px;border-top:1px solid #f1f5f9;">{{ $users->links() }}</div>
     </div>
+
+    {{-- Details Modal --}}
+    {{-- Create User Modal --}}
+    @if($showModal === 'create')
+    <div class="modal-overlay">
+        <div class="modal-box" style="max-width:500px;">
+            <div style="background:linear-gradient(135deg,#f97316,#ea580c);padding:20px 24px;display:flex;align-items:center;justify-content:space-between;">
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <div style="width:40px;height:40px;background:rgba(255,255,255,0.2);border-radius:12px;display:flex;align-items:center;justify-content:center;">
+                        <svg width="20" height="20" fill="none" stroke="white" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
+                    </div>
+                    <h3 style="font-weight:700;color:white;font-size:1rem;">إضافة مستخدم جديد</h3>
+                </div>
+                <button wire:click="closeModal" style="background:rgba(255,255,255,0.2);border:none;border-radius:8px;padding:6px;cursor:pointer;color:white;display:flex;">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div style="padding:22px 24px;display:flex;flex-direction:column;gap:14px;">
+                @if($createError)
+                <div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:10px;padding:10px 14px;color:#dc2626;font-size:0.82rem;">{{ $createError }}</div>
+                @endif
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                    <div style="grid-column:1/-1;">
+                        <label style="display:block;color:#374151;font-size:0.82rem;font-weight:600;margin-bottom:5px;">الاسم الكامل <span style="color:#dc2626;">*</span></label>
+                        <input wire:model="createForm.full_name" type="text" class="input-field" placeholder="الاسم الثلاثي" autocomplete="off">
+                        @error('createForm.full_name') <span style="color:#dc2626;font-size:0.75rem;margin-top:3px;display:block;">{{ $message }}</span> @enderror
+                    </div>
+                    <div>
+                        <label style="display:block;color:#374151;font-size:0.82rem;font-weight:600;margin-bottom:5px;">رقم الجوال <span style="color:#dc2626;">*</span></label>
+                        <input wire:model="createForm.phone" type="tel" class="input-field" placeholder="7XXXXXXXX" dir="ltr" autocomplete="off">
+                        @error('createForm.phone') <span style="color:#dc2626;font-size:0.75rem;margin-top:3px;display:block;">{{ $message }}</span> @enderror
+                    </div>
+                    <div>
+                        <label style="display:block;color:#374151;font-size:0.82rem;font-weight:600;margin-bottom:5px;">البريد الإلكتروني</label>
+                        <input wire:model="createForm.email" type="email" class="input-field" placeholder="email@example.com" dir="ltr" autocomplete="off">
+                    </div>
+                    <div>
+                        <label style="display:block;color:#374151;font-size:0.82rem;font-weight:600;margin-bottom:5px;">الدور <span style="color:#dc2626;">*</span></label>
+                        <select wire:model="createForm.user_role" class="input-field">
+                            <option value="customer">مستخدم عادي</option>
+                            <option value="station_owner">مالك محطة</option>
+                            <option value="station_worker">موظف محطة</option>
+                            <option value="admin">مدير النظام</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display:block;color:#374151;font-size:0.82rem;font-weight:600;margin-bottom:5px;">كلمة المرور <span style="color:#dc2626;">*</span></label>
+                        <input wire:model="createForm.password" type="password" class="input-field" placeholder="6 أحرف على الأقل" autocomplete="new-password">
+                        @error('createForm.password') <span style="color:#dc2626;font-size:0.75rem;margin-top:3px;display:block;">{{ $message }}</span> @enderror
+                    </div>
+                    <div>
+                        <label style="display:block;color:#374151;font-size:0.82rem;font-weight:600;margin-bottom:5px;">نوع المركبة</label>
+                        <input wire:model="createForm.vehicle_type" type="text" class="input-field" placeholder="مثال: تويوتا" autocomplete="off">
+                    </div>
+                </div>
+                <div style="background:#f8faff;border-radius:10px;padding:10px 14px;font-size:0.78rem;color:#64748b;border:1px solid #e2e8f0;">
+                    💡 سيتم إنشاء الحساب بحالة <strong style="color:#16a34a;">مقبول ومفعّل</strong> مباشرةً.
+                </div>
+            </div>
+            <div style="padding:14px 24px;background:#f8faff;border-top:1px solid #f1f5f9;display:flex;gap:10px;justify-content:flex-end;">
+                <button wire:click="closeModal" style="padding:9px 20px;color:#64748b;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.875rem;font-weight:600;cursor:pointer;background:white;font-family:'Tajawal',sans-serif;">إلغاء</button>
+                <button wire:click="createUser" wire:loading.attr="disabled" class="btn-primary" style="padding:9px 24px;">
+                    <span wire:loading.remove wire:target="createUser">إنشاء الحساب</span>
+                    <span wire:loading wire:target="createUser">جاري الإنشاء...</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    @endif
 
     {{-- Details Modal --}}
     @if($showModal === 'details' && $selectedUser)

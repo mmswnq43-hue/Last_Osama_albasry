@@ -33,9 +33,9 @@
                 <span style="color:#94a3b8;font-size:0.75rem;">{{ $user['created_at'] }}</span>
             </div>
 
-            <div style="padding:18px 20px;display:grid;grid-template-columns:1fr auto;gap:20px;">
+            <div class="pending-card-body">
                 {{-- Vehicle Info --}}
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                <div class="vehicle-info-grid">
                     <div style="background:#f8faff;border:1px solid #e2e8f0;border-radius:10px;padding:12px;">
                         <p style="color:#94a3b8;font-size:0.72rem;font-weight:600;margin-bottom:4px;">نوع المركبة</p>
                         <p style="color:#1e293b;font-weight:600;font-size:0.875rem;">{{ $user['vehicle_type'] ?? 'غير محدد' }}</p>
@@ -47,7 +47,7 @@
                 </div>
 
                 {{-- Subscription Info --}}
-                <div style="width:260px;flex-shrink:0;">
+                <div class="pending-sub-panel">
                     @if($user['subscription'])
                     <div style="background:linear-gradient(135deg,#fff7ed,#ffedd5);border:1.5px solid #fed7aa;border-radius:14px;padding:14px;">
                         <p style="color:#ea580c;font-weight:700;font-size:0.8rem;margin-bottom:10px;display:flex;align-items:center;gap:6px;">

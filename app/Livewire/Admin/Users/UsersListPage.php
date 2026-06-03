@@ -26,6 +26,16 @@ class UsersListPage extends Component
     public string $newRole = '';
     public string $successMessage = '';
 
+    public array $createForm = [
+        'full_name' => '',
+        'phone' => '',
+        'email' => '',
+        'user_role' => 'customer',
+        'password' => '',
+        'vehicle_type' => '',
+    ];
+    public string $createError = '';
+
     public function updatedSearch(): void { $this->resetPage(); }
     public function updatedRoleFilter(): void { $this->resetPage(); }
     public function updatedStatusFilter(): void { $this->resetPage(); }
@@ -69,6 +79,48 @@ class UsersListPage extends Component
         $user = User::findOrFail($this->selectedUser['id']);
         $user->forceFill(['user_role' => $this->newRole])->save();
         $this->successMessage = 'تم تغيير الدور بنجاح';
+        $this->closeModal();
+    }
+
+    public function openCreate(): void
+    {
+        $this->createForm = [
+            'full_name' => '',
+            'phone' => '',
+            'email' => '',
+            'user_role' => 'customer',
+            'password' => '',
+            'vehicle_type' => '',
+        ];
+        $this->createError = '';
+        $this->showModal = 'create';
+    }
+
+    public function createUser(): void
+    {
+        $this->createError = '';
+        $this->validate([
+            'createForm.full_name' => 'required|string|max:100',
+            'createForm.phone'     => 'required|string|max:20|unique:users,phone',
+            'createForm.email'     => 'nullable|email|max:150|unique:users,email',
+            'createForm.user_role' => 'required|in:customer,station_owner,station_worker,admin',
+            'createForm.password'  => 'required|string|min:6',
+            'createForm.vehicle_type' => 'nullable|string|max:100',
+        ]);
+
+        User::create([
+            'full_name'       => $this->createForm['full_name'],
+            'phone'           => $this->createForm['phone'],
+            'email'           => $this->createForm['email'] ?: null,
+            'user_role'       => $this->createForm['user_role'],
+            'password_hash'   => Hash::make($this->createForm['password']),
+            'vehicle_type'    => $this->createForm['vehicle_type'] ?: null,
+            'is_active'       => true,
+            'approval_status' => 'approved',
+            'created_at'      => now(),
+        ]);
+
+        $this->successMessage = 'تم إنشاء المستخدم بنجاح';
         $this->closeModal();
     }
 
