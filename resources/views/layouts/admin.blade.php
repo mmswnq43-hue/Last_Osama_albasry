@@ -109,10 +109,24 @@
                 width: 40px; height: 40px; border: none; background: #f0f4ff;
                 border-radius: 10px; cursor: pointer; flex-shrink: 0;
             }
-            .modal-overlay { padding: 10px; }
-            .modal-box { border-radius: 16px; }
+            .modal-overlay { padding: 8px; align-items: flex-end; }
+            .modal-box {
+                border-radius: 20px 20px 0 0;
+                max-width: 100% !important;
+                max-height: 92vh;
+                width: 100% !important;
+            }
+            .modal-box > div[style*="grid-template-columns:1fr 1fr"] {
+                grid-template-columns: 1fr !important;
+            }
             .stat-card { padding: 16px; border-radius: 14px; }
             .glass-card { border-radius: 14px; }
+        }
+        @media (max-width: 480px) {
+            .admin-stats-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+            .pending-card-body { grid-template-columns: 1fr; }
+            .pending-sub-panel { width: 100%; }
+            .vehicle-info-grid { grid-template-columns: 1fr; }
         }
 
         /* ── Responsive Grid Helpers ──────────────────── */

@@ -125,6 +125,7 @@ class OwnersListPage extends Component
         GasStation::create([
             'owner_id'            => $user->id,
             'station_name'        => $this->createForm['station_name'],
+            'commercial_register' => $this->createForm['license_number'] ?: null,
             'city'                => $this->createForm['city'],
             'district'            => $this->createForm['district'] ?: null,
             'license_number'      => $this->createForm['license_number'] ?: null,
