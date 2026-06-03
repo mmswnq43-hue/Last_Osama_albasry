@@ -28,6 +28,13 @@ class GasStation extends Model
         'rating_count',
         'services',
         'created_at',
+        'city',
+        'district',
+        'license_number',
+        'license_issue_date',
+        'license_expiry_date',
+        'pumps_count',
+        'fuel_types',
     ];
 
     // حقول محسوبة للتوافق مع Flutter
@@ -36,14 +43,18 @@ class GasStation extends Model
     protected function casts(): array
     {
         return [
-            'latitude'     => 'decimal:8',
-            'longitude'    => 'decimal:8',
-            'is_active'    => 'boolean',
-            'is_open'      => 'boolean',
-            'rating'       => 'float',
-            'rating_count' => 'integer',
-            'services'     => 'array',
-            'created_at'   => 'datetime',
+            'latitude'             => 'decimal:8',
+            'longitude'            => 'decimal:8',
+            'is_active'            => 'boolean',
+            'is_open'              => 'boolean',
+            'rating'               => 'float',
+            'rating_count'         => 'integer',
+            'services'             => 'array',
+            'fuel_types'           => 'array',
+            'created_at'           => 'datetime',
+            'license_issue_date'   => 'date',
+            'license_expiry_date'  => 'date',
+            'pumps_count'          => 'integer',
         ];
     }
 
